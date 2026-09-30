@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">RichFarmaciW</string>
+    <string name="btn_view_manual">Manuale Utente</string>
+    <string name="manual_dialog_title">Manuale Utente</string>
+    <string name="btn_close">Chiudi</string>
+    <string name="settings_title">Configurazione</string>
+    <string name="request_title">Richiesta Farmaci</string>
+    <string name="history_title">Cronologia</string>
+    <string name="save_config">SALVA CONFIGURAZIONE</string>
+    <string name="patient_data">Dati Paziente</string>
+    <string name="doctor_data">Dati Medico</string>
+    <string name="medications_list">Gestore Rubrica Farmaci</string>
+    <string name="add_medication">Nuovo Farmaco/Notifica</string>
+    <string name="backup_restore">Backup e Ripristino</string>
+    <string name="support_project">Sostieni il Progetto</string>
+    <string name="disclaimer_title">Limitazione di Responsabilità</string>
+    <string name="send_request">Invia richiesta al Medico</string>
+    <string name="quick_message">Messaggio Veloce al Medico</string>
+    <string name="new_profile">Nuovo Profilo</string>
+    <string name="delete_profile">Elimina Profilo</string>
+    <string name="notifications_active">Attiva Notifiche</string>
+</resources>

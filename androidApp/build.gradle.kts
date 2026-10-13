@@ -1,6 +1,11 @@
 plugins {
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeCompiler)
+}
+
+kotlin {
+    androidTarget()
 }
 
 dependencies {
@@ -15,6 +20,9 @@ dependencies {
 android {
     namespace = "com.aistudio.richfarmaciw"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    sourceSets["main"].manifest.srcFile("src/main/AndroidManifest.xml")
+    sourceSets["main"].res.srcDirs("src/main/res")
 
     defaultConfig {
         applicationId = "com.aistudio.richfarmaciw"

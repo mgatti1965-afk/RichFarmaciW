@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
@@ -32,16 +33,16 @@ kotlin {
         }
     }
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        binaries.executable()
-    }
+    // @OptIn(ExperimentalWasmDsl::class)
+    // wasmJs {
+    //     browser()
+    //     binaries.executable()
+    // }
 
-    js {
-        browser()
-        binaries.executable()
-    }
+    // js {
+    //     browser()
+    //     binaries.executable()
+    // }
     
     sourceSets {
         val commonMain by getting {
@@ -88,12 +89,12 @@ kotlin {
         val webMain by creating {
             dependsOn(commonMain)
         }
-        val wasmJsMain by getting {
-            dependsOn(webMain)
-        }
-        val jsMain by getting {
-            dependsOn(webMain)
-        }
+        // val wasmJsMain by getting {
+        //     dependsOn(webMain)
+        // }
+        // val jsMain by getting {
+        //     dependsOn(webMain)
+        // }
     }
 }
 
@@ -103,8 +104,8 @@ dependencies {
     add("kspJvm", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-    add("kspWasmJs", libs.androidx.room.compiler)
-    add("kspJs", libs.androidx.room.compiler)
+    // add("kspWasmJs", libs.androidx.room.compiler)
+    // add("kspJs", libs.androidx.room.compiler)
 }
 
 android {

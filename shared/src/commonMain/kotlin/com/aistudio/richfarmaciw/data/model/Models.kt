@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ForeignKey
 import androidx.room.Index
+import kotlinx.serialization.Serializable
 
 fun generateId(): String {
     val chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -11,12 +12,14 @@ fun generateId(): String {
 }
 
 @Entity(tableName = "app_metadata")
+@Serializable
 data class AppMetadata(
     @PrimaryKey val key: String,
     val value: String
 )
 
 @Entity(tableName = "profiles")
+@Serializable
 data class Profile(
     @PrimaryKey val id: String = generateId(),
     val pazienteNome: String = "",
@@ -44,6 +47,7 @@ data class Profile(
     ],
     indices = [Index("profileId")]
 )
+@Serializable
 data class Medication(
     @PrimaryKey val id: String = generateId(),
     val profileId: String,
@@ -57,6 +61,7 @@ data class Medication(
     val frequenzaTipo: String = "GIORNI"
 )
 
+@Serializable
 data class SentMedication(
     val nome: String,
     val scatole: Int,
@@ -75,6 +80,7 @@ data class SentMedication(
     ],
     indices = [Index("profileId")]
 )
+@Serializable
 data class SentRequest(
     @PrimaryKey val id: String = generateId(),
     val profileId: String,

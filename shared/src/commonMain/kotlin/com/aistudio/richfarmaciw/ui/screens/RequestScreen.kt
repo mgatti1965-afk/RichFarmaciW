@@ -220,28 +220,29 @@ fun RequestScreen(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = White,
-            shadowElevation = 8.dp
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+            shadowElevation = 10.dp
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 if (selectedIds.isNotEmpty()) {
                     Button(
                         onClick = { showPreviewDialog = true },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        modifier = Modifier.fillMaxWidth().height(54.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp)
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = White)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("INVIA RICHIESTA AL MEDICO", fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text("INVIA RICHIESTA AL MEDICO", fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     }
                 } else {
                     OutlinedButton(
                         onClick = { showQuickMsgDialog = true },
-                        modifier = Modifier.fillMaxWidth().height(50.dp),
-                        border = BorderStroke(1.dp, GreenPrimary),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        border = BorderStroke(1.5.dp, GreenPrimary),
+                        shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text("Messaggio veloce al Medico", color = GreenPrimary, fontWeight = FontWeight.Bold)
+                        Text("Messaggio veloce al Medico", color = GreenPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     }
                 }
             }
@@ -295,19 +296,25 @@ fun MedicationRequestRow(
     onQtyChange: (Int) -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onToggle() },
-        colors = CardDefaults.cardColors(containerColor = if (isSelected) GreenPrimary.copy(alpha = 0.05f) else White),
-        border = BorderStroke(1.dp, if (isSelected) GreenPrimary else GrayBorder),
-        shape = RoundedCornerShape(12.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onToggle() },
+        colors = CardDefaults.cardColors(containerColor = if (isSelected) GreenLightBg else White),
+        border = BorderStroke(if (isSelected) 1.5.dp else 1.dp, if (isSelected) GreenPrimary else GrayBorder),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 2.dp else 1.dp)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp).fillMaxWidth(),
+            modifier = Modifier.padding(14.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
                 checked = isSelected,
                 onCheckedChange = { onToggle() },
-                colors = CheckboxDefaults.colors(checkedColor = GreenPrimary)
+                colors = CheckboxDefaults.colors(
+                    checkedColor = GreenPrimary,
+                    uncheckedColor = Slate600.copy(alpha = 0.5f)
+                )
             )
             Column(modifier = Modifier.weight(1f).padding(horizontal = 8.dp)) {
                 Text(
@@ -317,26 +324,72 @@ fun MedicationRequestRow(
                     fontSize = 16.sp
                 )
                 if (med.note.isNotBlank()) {
-                    Text(text = med.note, fontSize = 13.sp, color = Slate600)
+                    Text(
+                        text = med.note,
+                        fontSize = 13.sp,
+                        color = Slate600
+                    )
                 }
             }
             if (isSelected) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { if (quantity > 1) onQtyChange(quantity - 1) }, modifier = Modifier.size(32.dp)) {
-                        Icon(Icons.Default.Remove, contentDescription = null, tint = GreenPrimary)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    IconButton(
+                        onClick = { if (quantity > 1) onQtyChange(quantity - 1) },
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(GreenPrimary.copy(alpha = 0.12f), CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Default.Remove,
+                            contentDescription = "Rimuovi",
+                            tint = GreenPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
-                    Text(
-                        text = quantity.toString(),
-                        fontWeight = FontWeight.Bold,
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
                         color = GreenPrimary,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                    IconButton(onClick = { onQtyChange(quantity + 1) }, modifier = Modifier.size(32.dp)) {
-                        Icon(Icons.Default.Add, contentDescription = null, tint = GreenPrimary)
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    ) {
+                        Text(
+                            text = "$quantity",
+                            fontWeight = FontWeight.ExtraBold,
+                            color = White,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = { onQtyChange(quantity + 1) },
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(GreenPrimary.copy(alpha = 0.12f), CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Aggiungi",
+                            tint = GreenPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
             } else {
-                Text(text = "$quantity pz", color = Slate600, fontSize = 14.sp)
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = GrayBackground,
+                    border = BorderStroke(1.dp, GrayBorder)
+                ) {
+                    Text(
+                        text = "$quantity pz",
+                        color = Slate600,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
             }
         }
     }

@@ -523,39 +523,82 @@ fun ConfigurationMedicationRow(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = if (med.inPausa) GrayBackground else White),
-        border = BorderStroke(1.dp, GrayBorder),
-        shape = RoundedCornerShape(12.dp)
+        border = BorderStroke(1.dp, if (med.inPausa) GrayBorder else GreenPrimary.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp).fillMaxWidth(),
+            modifier = Modifier.padding(14.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = med.nome,
-                    fontWeight = FontWeight.Bold,
-                    color = if (med.inPausa) Slate600 else Slate900,
-                    fontSize = 16.sp
-                )
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = med.nome,
+                        fontWeight = FontWeight.Bold,
+                        color = if (med.inPausa) Slate600 else Slate900,
+                        fontSize = 16.sp
+                    )
+                    if (med.inPausa) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = OrangeAlert.copy(alpha = 0.15f)
+                        ) {
+                            Text(
+                                text = "IN PAUSA",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = OrangeAlert,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
                 if (med.note.isNotBlank()) {
                     Text(text = med.note, fontSize = 13.sp, color = Slate600)
                 }
-                Text(text = "Scatole standard: ${med.scatole}", fontSize = 12.sp, color = Slate600)
+                Text(
+                    text = "Scatole predefinite: ${med.scatole}",
+                    fontSize = 12.sp,
+                    color = Slate600,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                IconButton(onClick = onToggleStandby) {
+                IconButton(
+                    onClick = onToggleStandby,
+                    modifier = Modifier.size(34.dp).background(GrayBackground, CircleShape)
+                ) {
                     Icon(
                         imageVector = if (med.inPausa) Icons.Default.PlayArrow else Icons.Default.Pause,
                         contentDescription = "Sospendi/Riprendi",
-                        tint = if (med.inPausa) GreenPrimary else Slate600
+                        tint = if (med.inPausa) GreenPrimary else Slate600,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
-                IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Slate600)
+                IconButton(
+                    onClick = onEdit,
+                    modifier = Modifier.size(34.dp).background(GrayBackground, CircleShape)
+                ) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Modifica",
+                        tint = Slate600,
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
-                IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color.Red.copy(alpha = 0.7f))
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(34.dp).background(GrayBackground, CircleShape)
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Elimina",
+                        tint = Color.Red.copy(alpha = 0.7f),
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
         }

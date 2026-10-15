@@ -406,25 +406,47 @@ fun ProfileContextSwitcher(
         Surface(
             onClick = { expanded = true },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            color = BlueInputBg,
-            border = BorderStroke(1.dp, GrayBorder),
-            shadowElevation = 1.dp
+            shape = RoundedCornerShape(16.dp),
+            color = GreenLightBg.copy(alpha = 0.6f),
+            border = BorderStroke(1.dp, GreenPrimary.copy(alpha = 0.3f)),
+            shadowElevation = 0.dp
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = GreenPrimary.copy(alpha = 0.15f),
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = null,
+                                tint = GreenPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = activeProfile?.pazienteNome ?: "Seleziona Profilo",
-                            fontSize = 17.sp,
+                            text = activeProfile?.pazienteNome?.ifBlank { "Seleziona Profilo" } ?: "Seleziona Profilo",
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Slate900,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = if (activeProfile?.pazienteCf?.isNotBlank() == true) "C.F. ${activeProfile.pazienteCf}" else "Paziente attivo",
+                            fontSize = 12.sp,
+                            color = Slate600,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -433,7 +455,8 @@ fun ProfileContextSwitcher(
                 Icon(
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = Slate600
+                    tint = GreenPrimary,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }

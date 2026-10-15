@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
@@ -139,10 +140,11 @@ fun HistoryItemRow(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = White),
         border = BorderStroke(1.dp, GrayBorder),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp).fillMaxWidth(),
+            modifier = Modifier.padding(14.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -156,15 +158,32 @@ fun HistoryItemRow(
                 Text(
                     text = "Paziente: ${request.pazienteNome}",
                     color = Slate600,
-                    fontSize = 14.sp
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(top = 2.dp)
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                IconButton(onClick = onView) {
-                    Icon(Icons.Default.Visibility, contentDescription = "Visualizza", tint = Slate600)
+                IconButton(
+                    onClick = onView,
+                    modifier = Modifier.size(34.dp).background(GrayBackground, CircleShape)
+                ) {
+                    Icon(
+                        Icons.Default.Visibility,
+                        contentDescription = "Visualizza",
+                        tint = Slate600,
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
-                IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color.Red.copy(alpha = 0.7f))
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(34.dp).background(GrayBackground, CircleShape)
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Elimina",
+                        tint = Color.Red.copy(alpha = 0.7f),
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
         }

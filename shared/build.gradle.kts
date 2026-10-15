@@ -33,16 +33,16 @@ kotlin {
         }
     }
 
-    // @OptIn(ExperimentalWasmDsl::class)
-    // wasmJs {
-    //     browser()
-    //     binaries.executable()
-    // }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
 
-    // js {
-    //     browser()
-    //     binaries.executable()
-    // }
+    js {
+        browser()
+        binaries.executable()
+    }
     
     sourceSets {
         val commonMain by getting {
@@ -53,11 +53,17 @@ kotlin {
                 implementation(libs.compose.materialIconsExtended)
                 implementation(libs.compose.ui)
                 implementation(libs.compose.components.resources)
-                implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(libs.kotlinx.serialization.json)
 
+                implementation(libs.androidx.room.common)
+            }
+        }
+
+        val roomTargetsMain by creating {
+            dependsOn(commonMain)
+            dependencies {
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.sqlite.bundled)
                 implementation(libs.sqlite)
@@ -72,16 +78,19 @@ kotlin {
         }
 
         val androidMain by getting {
+            dependsOn(roomTargetsMain)
             dependencies {
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.compose.uiTooling)
             }
         }
 
-        val jvmMain by getting {}
+        val jvmMain by getting {
+            dependsOn(roomTargetsMain)
+        }
 
         val iosMain by creating {
-            dependsOn(commonMain)
+            dependsOn(roomTargetsMain)
         }
         val iosArm64Main by getting { dependsOn(iosMain) }
         val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
@@ -89,23 +98,20 @@ kotlin {
         val webMain by creating {
             dependsOn(commonMain)
         }
-        // val wasmJsMain by getting {
-        //     dependsOn(webMain)
-        // }
-        // val jsMain by getting {
-        //     dependsOn(webMain)
-        // }
+        val wasmJsMain by getting {
+            dependsOn(webMain)
+        }
+        val jsMain by getting {
+            dependsOn(webMain)
+        }
     }
 }
 
 dependencies {
-    add("kspCommonMainMetadata", libs.androidx.room.compiler)
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspJvm", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-    // add("kspWasmJs", libs.androidx.room.compiler)
-    // add("kspJs", libs.androidx.room.compiler)
 }
 
 android {

@@ -1,10 +1,7 @@
 package com.aistudio.richfarmaciw.data.db
 
-import androidx.room.Room
-import androidx.room.RoomDatabase
+private var webDbInstance: RichFarmaciDatabase? = null
 
-actual fun createDatabaseBuilder(context: Any?): RoomDatabase.Builder<AppDatabase> {
-    return Room.databaseBuilder<AppDatabase>(
-        name = "richfarmaci.db"
-    )
+actual fun provideRichFarmaciDatabase(context: Any?): RichFarmaciDatabase {
+    return webDbInstance ?: WebRichFarmaciDatabase().also { webDbInstance = it }
 }

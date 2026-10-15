@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-actual fun createDatabaseBuilder(context: Any?): RoomDatabase.Builder<AppDatabase> {
+fun createDatabaseBuilder(context: Any?): RoomDatabase.Builder<AppDatabase> {
     val ctx = context as? Context
     val appContext = ctx?.applicationContext ?: ctx
     val dbFile = try {
@@ -24,5 +24,8 @@ actual fun createDatabaseBuilder(context: Any?): RoomDatabase.Builder<AppDatabas
     }
 }
 
+private var dbInstance: RichFarmaciDatabase? = null
 
-
+actual fun provideRichFarmaciDatabase(context: Any?): RichFarmaciDatabase {
+    return dbInstance ?: getRoomDatabase(createDatabaseBuilder(context)).also { dbInstance = it }
+}

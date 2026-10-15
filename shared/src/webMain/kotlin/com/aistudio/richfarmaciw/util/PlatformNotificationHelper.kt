@@ -4,7 +4,6 @@ import com.aistudio.richfarmaciw.data.model.Medication
 
 actual object PlatformNotificationHelper {
     actual fun scheduleNotification(context: Any?, medication: Medication, description: String) {
-        // Web implementation: would require Service Workers or browser Notification API
         println("Web Notification Scheduled: ${medication.nome} - $description")
     }
 
@@ -17,7 +16,6 @@ actual object PlatformNotificationHelper {
     }
 
     actual fun showNotification(context: Any?, title: String, message: String) {
-        // Basic web notification or alert could be used here
         println("Browser Alert: [$title] $message")
     }
 

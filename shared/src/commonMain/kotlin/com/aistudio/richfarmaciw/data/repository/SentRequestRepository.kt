@@ -1,26 +1,18 @@
 package com.aistudio.richfarmaciw.data.repository
 
-import com.aistudio.richfarmaciw.data.db.SentRequestDao
+import com.aistudio.richfarmaciw.data.db.RichFarmaciDatabase
 import com.aistudio.richfarmaciw.data.model.SentRequest
 import kotlinx.coroutines.flow.Flow
 
-class SentRequestRepository(private val sentRequestDao: SentRequestDao) {
+class SentRequestRepository(private val db: RichFarmaciDatabase) {
     fun getSentRequestsByProfile(profileId: String): Flow<List<SentRequest>> =
-        sentRequestDao.getSentRequestsByProfile(profileId)
+        db.getSentRequestsByProfile(profileId)
 
     suspend fun insert(sentRequest: SentRequest) {
-        sentRequestDao.insert(sentRequest)
+        db.insertSentRequest(sentRequest)
     }
 
     suspend fun delete(sentRequest: SentRequest) {
-        sentRequestDao.delete(sentRequest)
-    }
-
-    suspend fun deleteById(id: String) {
-        sentRequestDao.deleteById(id)
-    }
-
-    suspend fun clearAll() {
-        sentRequestDao.deleteAll()
+        db.deleteSentRequest(sentRequest)
     }
 }

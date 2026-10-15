@@ -55,7 +55,6 @@ abstract class AppDatabase : RoomDatabase(), RichFarmaciDatabase {
     }
 }
 
-// Room compiler generates the implementation for this
 @Suppress("KotlinNoActualForExpect")
 expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
     override fun initialize(): AppDatabase

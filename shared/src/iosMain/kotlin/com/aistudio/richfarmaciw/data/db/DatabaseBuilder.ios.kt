@@ -6,7 +6,7 @@ import platform.Foundation.NSHomeDirectory
 import kotlinx.cinterop.ExperimentalForeignApi
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun createDatabaseBuilder(context: Any?): RoomDatabase.Builder<AppDatabase> {
+fun createDatabaseBuilder(context: Any?): RoomDatabase.Builder<AppDatabase> {
     val dbFilePath = NSHomeDirectory() + "/Documents/richfarmaci_database.db"
     return Room.databaseBuilder<AppDatabase>(
         name = dbFilePath,
@@ -14,3 +14,8 @@ actual fun createDatabaseBuilder(context: Any?): RoomDatabase.Builder<AppDatabas
     )
 }
 
+private var dbInstance: RichFarmaciDatabase? = null
+
+actual fun provideRichFarmaciDatabase(context: Any?): RichFarmaciDatabase {
+    return dbInstance ?: getRoomDatabase(createDatabaseBuilder(context)).also { dbInstance = it }
+}

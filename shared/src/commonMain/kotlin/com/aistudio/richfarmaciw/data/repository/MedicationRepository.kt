@@ -1,26 +1,24 @@
 package com.aistudio.richfarmaciw.data.repository
 
-import com.aistudio.richfarmaciw.data.db.MedicationDao
+import com.aistudio.richfarmaciw.data.db.RichFarmaciDatabase
 import com.aistudio.richfarmaciw.data.model.Medication
 import kotlinx.coroutines.flow.Flow
 
-class MedicationRepository(private val medicationDao: MedicationDao) {
+class MedicationRepository(private val db: RichFarmaciDatabase) {
 
     fun getMedicationsByProfile(profileId: String): Flow<List<Medication>> =
-        medicationDao.getMedicationsByProfile(profileId)
+        db.getMedicationsByProfile(profileId)
 
     suspend fun getMedicationsSnapshotByProfile(profileId: String): List<Medication> =
-        medicationDao.getMedicationsSnapshotByProfile(profileId)
+        db.getMedicationsSnapshotByProfile(profileId)
 
-    suspend fun insert(medication: Medication) = medicationDao.insert(medication)
+    suspend fun insert(medication: Medication) = db.insertMedication(medication)
 
-    suspend fun update(medication: Medication) = medicationDao.update(medication)
+    suspend fun update(medication: Medication) = db.updateMedication(medication)
 
-    suspend fun delete(medication: Medication) = medicationDao.delete(medication)
+    suspend fun delete(medication: Medication) = db.deleteMedication(medication)
 
-    suspend fun deleteById(id: String) = medicationDao.deleteById(id)
-
-    suspend fun clearAll() = medicationDao.deleteAll()
+    suspend fun deleteById(id: String) = db.deleteMedicationById(id)
 
     fun getDefaultMedicationsList(profileId: String) = listOf(
         Medication(profileId = profileId, nome = "Zanedip 10 mg", scatole = 2, note = "compresse"),
@@ -33,6 +31,6 @@ class MedicationRepository(private val medicationDao: MedicationDao) {
     )
 
     suspend fun forcePrepopulateWithDefaults(profileId: String) {
-        medicationDao.insertAll(getDefaultMedicationsList(profileId))
+        db.insertAllMedications(getDefaultMedicationsList(profileId))
     }
 }

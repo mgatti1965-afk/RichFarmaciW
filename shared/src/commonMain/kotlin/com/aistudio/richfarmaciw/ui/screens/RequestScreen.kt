@@ -201,7 +201,7 @@ fun RequestScreen(
             } else {
                 items(activeMeds, key = { it.id }) { med ->
                     val isSelected = selectedIds.contains(med.id)
-                    val qty = selectedQuantities[med.id] ?: med.scatole
+                    val qty = selectedQuantities[med.id] ?: med.scatole.coerceAtLeast(1)
 
                     MedicationRequestRow(
                         med = med,

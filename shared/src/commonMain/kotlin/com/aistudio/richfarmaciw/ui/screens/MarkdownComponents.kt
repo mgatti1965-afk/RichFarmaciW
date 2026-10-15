@@ -119,9 +119,8 @@ fun MarkdownText(
 
                             anchor?.let { annotation ->
                                 val target = normalizeAnchor(annotation.item)
-                                val match = headerPositions.keys.firstOrNull {
-                                    it == target || it.contains(target) || target.contains(it)
-                                }
+                                val match = headerPositions.keys.firstOrNull { it == target }
+                                    ?: headerPositions.keys.firstOrNull { it.contains(target) || target.contains(it) }
                                 match?.let { key ->
                                     headerPositions[key]?.let { y ->
                                         coroutineScope.launch {

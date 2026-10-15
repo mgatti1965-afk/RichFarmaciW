@@ -222,26 +222,27 @@ fun RequestScreen(
             color = White,
             shadowElevation = 8.dp
         ) {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = { showPreviewDialog = true },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = selectedIds.isNotEmpty()
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = White)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("INVIA RICHIESTA AL MEDICO", fontWeight = FontWeight.Bold)
-                }
-
-                OutlinedButton(
-                    onClick = { showQuickMsgDialog = true },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    border = BorderStroke(1.dp, GreenPrimary),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Messaggio veloce al Medico", color = GreenPrimary, fontWeight = FontWeight.Bold)
+            Column(modifier = Modifier.padding(16.dp)) {
+                if (selectedIds.isNotEmpty()) {
+                    Button(
+                        onClick = { showPreviewDialog = true },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("INVIA RICHIESTA AL MEDICO", fontWeight = FontWeight.Bold)
+                    }
+                } else {
+                    OutlinedButton(
+                        onClick = { showQuickMsgDialog = true },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        border = BorderStroke(1.dp, GreenPrimary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Messaggio veloce al Medico", color = GreenPrimary, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }

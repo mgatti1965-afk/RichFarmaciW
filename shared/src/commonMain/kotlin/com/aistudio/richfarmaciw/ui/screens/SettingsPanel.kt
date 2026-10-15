@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aistudio.richfarmaciw.data.model.Medication
@@ -160,22 +161,30 @@ fun SettingsPanelContent(
     Column(modifier = Modifier.fillMaxSize().background(GrayBackground)) {
         Column(modifier = Modifier.fillMaxWidth().background(White).padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                     Icon(
                         painter = painterResource(Res.drawable.app_icon),
                         contentDescription = null,
                         modifier = Modifier.size(32.dp),
                         tint = Color.Unspecified
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
-                        Text(text = "⚙️ Configurazione", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Slate900)
+                        Text(
+                            text = "⚙️ Configurazione",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Slate900,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                         if (isNewProfile) {
-                            Text(text = "CREAZIONE NUOVO PROFILO", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = GreenPrimary)
+                            Text(text = "CREAZIONE NUOVO PROFILO", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = GreenPrimary)
                         }
                     }
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     IconButton(onClick = { showBackupDialog = true }, modifier = Modifier.background(GrayBackground, CircleShape)) {
                         Icon(Icons.Default.CloudUpload, contentDescription = "Backup", tint = GreenPrimary)
                     }

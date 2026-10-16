@@ -7,14 +7,14 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.room)
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 kotlin {
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -92,15 +92,18 @@ kotlin {
         val iosMain by creating {
             dependsOn(roomTargetsMain)
         }
-        val iosArm64Main by getting { dependsOn(iosMain) }
-        val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
 
         val webMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                implementation(libs.kotlinx.serialization.json)
+            }
         }
+
         val wasmJsMain by getting {
             dependsOn(webMain)
         }
+
         val jsMain by getting {
             dependsOn(webMain)
         }

@@ -1,7 +1,9 @@
 package com.aistudio.richfarmaciw.data.db
 
 import com.aistudio.richfarmaciw.data.model.*
-import kotlinx.browser.localStorage
+import com.aistudio.richfarmaciw.util.webGetItem
+import com.aistudio.richfarmaciw.util.webRemoveItem
+import com.aistudio.richfarmaciw.util.webSetItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -27,7 +29,7 @@ class WebRichFarmaciDatabase : RichFarmaciDatabase {
 
     private fun loadProfiles(): List<Profile> {
         return try {
-            val raw = localStorage.getItem(KEY_PROFILES) ?: return emptyList()
+            val raw = webGetItem(KEY_PROFILES) ?: return emptyList()
             json.decodeFromString(raw)
         } catch (_: Exception) {
             emptyList()
@@ -36,14 +38,14 @@ class WebRichFarmaciDatabase : RichFarmaciDatabase {
 
     private fun saveProfiles(list: List<Profile>) {
         try {
-            localStorage.setItem(KEY_PROFILES, json.encodeToString(list))
+            webSetItem(KEY_PROFILES, json.encodeToString(list))
         } catch (_: Exception) {}
         profilesFlow.value = list
     }
 
     private fun loadMedications(): List<Medication> {
         return try {
-            val raw = localStorage.getItem(KEY_MEDICATIONS) ?: return emptyList()
+            val raw = webGetItem(KEY_MEDICATIONS) ?: return emptyList()
             json.decodeFromString(raw)
         } catch (_: Exception) {
             emptyList()
@@ -52,14 +54,14 @@ class WebRichFarmaciDatabase : RichFarmaciDatabase {
 
     private fun saveMedications(list: List<Medication>) {
         try {
-            localStorage.setItem(KEY_MEDICATIONS, json.encodeToString(list))
+            webSetItem(KEY_MEDICATIONS, json.encodeToString(list))
         } catch (_: Exception) {}
         medicationsFlow.value = list
     }
 
     private fun loadSentRequests(): List<SentRequest> {
         return try {
-            val raw = localStorage.getItem(KEY_SENT_REQUESTS) ?: return emptyList()
+            val raw = webGetItem(KEY_SENT_REQUESTS) ?: return emptyList()
             json.decodeFromString(raw)
         } catch (_: Exception) {
             emptyList()
@@ -68,14 +70,14 @@ class WebRichFarmaciDatabase : RichFarmaciDatabase {
 
     private fun saveSentRequests(list: List<SentRequest>) {
         try {
-            localStorage.setItem(KEY_SENT_REQUESTS, json.encodeToString(list))
+            webSetItem(KEY_SENT_REQUESTS, json.encodeToString(list))
         } catch (_: Exception) {}
         sentRequestsFlow.value = list
     }
 
     private fun loadMetadata(): Map<String, String> {
         return try {
-            val raw = localStorage.getItem(KEY_METADATA) ?: return emptyMap()
+            val raw = webGetItem(KEY_METADATA) ?: return emptyMap()
             json.decodeFromString(raw)
         } catch (_: Exception) {
             emptyMap()
@@ -84,7 +86,7 @@ class WebRichFarmaciDatabase : RichFarmaciDatabase {
 
     private fun saveMetadata() {
         try {
-            localStorage.setItem(KEY_METADATA, json.encodeToString(metadataMap))
+            webSetItem(KEY_METADATA, json.encodeToString(metadataMap))
         } catch (_: Exception) {}
     }
 
@@ -195,10 +197,10 @@ class WebRichFarmaciDatabase : RichFarmaciDatabase {
     // Maintenance
     override suspend fun clearAllData() {
         try {
-            localStorage.removeItem(KEY_PROFILES)
-            localStorage.removeItem(KEY_MEDICATIONS)
-            localStorage.removeItem(KEY_SENT_REQUESTS)
-            localStorage.removeItem(KEY_METADATA)
+            webRemoveItem(KEY_PROFILES)
+            webRemoveItem(KEY_MEDICATIONS)
+            webRemoveItem(KEY_SENT_REQUESTS)
+            webRemoveItem(KEY_METADATA)
         } catch (_: Exception) {}
         profilesFlow.value = emptyList()
         medicationsFlow.value = emptyList()

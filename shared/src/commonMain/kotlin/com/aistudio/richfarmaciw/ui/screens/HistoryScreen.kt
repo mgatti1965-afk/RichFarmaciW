@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -39,44 +40,49 @@ fun HistoryScreen(viewModel: MainViewModel, manualText: String) {
         HelpDialog(type = "cronologia", manualText = manualText, onDismiss = { showHelp = false })
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(GrayBackground)) {
+    Column(
+        modifier = Modifier.fillMaxSize().background(GrayBackground),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         // Top Bar
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = White,
             shadowElevation = 2.dp
         ) {
-            Column {
-                Row(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(Res.drawable.app_icon),
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp),
-                            tint = Color.Unspecified
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Cronologia",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Slate900
-                        )
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Column(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.MedicalServices,
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp),
+                                tint = GreenPrimary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Cronologia",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Slate900
+                            )
+                        }
+                        IconButton(onClick = { showHelp = true }) {
+                            Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
+                        }
                     }
-                    IconButton(onClick = { showHelp = true }) {
-                        Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
-                    }
-                }
 
-                ProfileContextSwitcher(
-                    profiles = profiles,
-                    activeProfile = activeProfile,
-                    onProfileSelected = { viewModel.selectProfile(it) }
-                )
+                    ProfileContextSwitcher(
+                        profiles = profiles,
+                        activeProfile = activeProfile,
+                        onProfileSelected = { viewModel.selectProfile(it) }
+                    )
+                }
             }
         }
 
@@ -85,17 +91,19 @@ fun HistoryScreen(viewModel: MainViewModel, manualText: String) {
                 Text("Nessuna richiesta inviata.", color = Slate600, fontWeight = FontWeight.Medium)
             }
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(vertical = 16.dp)
-            ) {
-                items(requests, key = { it.id }) { req ->
-                    HistoryItemRow(
-                        request = req,
-                        onView = { selectedRequestForDialog = req },
-                        onDelete = { viewModel.deleteHistoryItem(req) }
-                    )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                LazyColumn(
+                    modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp)
+                ) {
+                    items(requests, key = { it.id }) { req ->
+                        HistoryItemRow(
+                            request = req,
+                            onView = { selectedRequestForDialog = req },
+                            onDelete = { viewModel.deleteHistoryItem(req) }
+                        )
+                    }
                 }
             }
         }

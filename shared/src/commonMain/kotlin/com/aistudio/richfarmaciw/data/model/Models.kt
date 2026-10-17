@@ -1,5 +1,7 @@
 package com.aistudio.richfarmaciw.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -21,9 +23,10 @@ fun generateId(): String {
     return (1..16).map { chars.random() }.joinToString("")
 }
 
+@Entity(tableName = "app_metadata")
 @Serializable(with = AppMetadataSerializer::class)
 data class AppMetadata(
-    val key: String,
+    @PrimaryKey val key: String,
     val value: String
 )
 
@@ -38,9 +41,10 @@ object AppMetadataSerializer : KSerializer<AppMetadata> {
     }
 }
 
+@Entity(tableName = "profiles")
 @Serializable(with = ProfileSerializer::class)
 data class Profile(
-    val id: String = generateId(),
+    @PrimaryKey val id: String = generateId(),
     val pazienteNome: String = "",
     val pazienteCf: String = "",
     val medicoNome: String = "",
@@ -92,9 +96,10 @@ object ProfileSerializer : KSerializer<Profile> {
     }
 }
 
+@Entity(tableName = "medications")
 @Serializable(with = MedicationSerializer::class)
 data class Medication(
-    val id: String = generateId(),
+    @PrimaryKey val id: String = generateId(),
     val profileId: String,
     val nome: String,
     val scatole: Int = 1,
@@ -167,9 +172,10 @@ object SentMedicationSerializer : KSerializer<SentMedication> {
     }
 }
 
+@Entity(tableName = "sent_requests")
 @Serializable(with = SentRequestSerializer::class)
 data class SentRequest(
-    val id: String = generateId(),
+    @PrimaryKey val id: String = generateId(),
     val profileId: String,
     val data: String,
     val pazienteNome: String,

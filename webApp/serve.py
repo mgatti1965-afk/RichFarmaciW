@@ -5,10 +5,15 @@ import os
 
 PORT = 8080
 base_dir = os.path.dirname(__file__)
-dev_dir = os.path.join(base_dir, "build", "dist", "wasmJs", "developmentExecutable")
-prod_dir = os.path.join(base_dir, "build", "dist", "wasmJs", "productionExecutable")
 
-DIRECTORY = dev_dir if os.path.exists(dev_dir) else prod_dir
+candidates = [
+    os.path.join(base_dir, "build", "dist", "wasmJs", "developmentExecutable"),
+    os.path.join(base_dir, "build", "dist", "wasmJs", "productionExecutable"),
+    os.path.join(base_dir, "build", "dist", "js", "developmentExecutable"),
+    os.path.join(base_dir, "build", "dist", "js", "productionExecutable"),
+]
+
+DIRECTORY = next((c for c in candidates if os.path.exists(c)), base_dir)
 
 mimetypes.add_type('application/wasm', '.wasm')
 mimetypes.add_type('application/javascript', '.mjs')

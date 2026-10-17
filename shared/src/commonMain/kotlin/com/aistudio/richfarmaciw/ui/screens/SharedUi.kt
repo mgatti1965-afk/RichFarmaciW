@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.aistudio.richfarmaciw.data.model.Profile
 import com.aistudio.richfarmaciw.ui.theme.*
 import com.aistudio.richfarmaciw.ui.viewmodel.MainViewModel
+import com.aistudio.richfarmaciw.util.saveBackupFile
 import org.jetbrains.compose.resources.painterResource
 import richfarmaciw.shared.generated.resources.*
 
@@ -293,6 +295,7 @@ fun BackupDialog(
     var backupJson by remember { mutableStateOf("") }
     var showImportArea by remember { mutableStateOf(false) }
     var errorMsg by remember { mutableStateOf<String?>(null) }
+    var downloadMsg by remember { mutableStateOf<String?>(null) }
     val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
 
     AlertDialog(
@@ -316,16 +319,32 @@ fun BackupDialog(
                     Button(
                         onClick = {
                             viewModel.exportBackup { json ->
-                                clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(json))
+                                val fileName = "backup_richfarmaci.json"
+                                val saved = saveBackupFile(fileName, json)
+                                if (saved) {
+                                    downloadMsg = "File salvato nei Download!"
+                                } else {
+                                    clipboardManager.setText(AnnotatedString(json))
+                                    downloadMsg = "Copiato negli appunti!"
+                                }
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.ContentCopy, contentDescription = null, tint = White)
+                        Icon(Icons.Default.Download, contentDescription = null, tint = White)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("COPIA BACKUP (JSON)", color = White)
+                        Text("SCARICA FILE (JSON)", color = White)
+                    }
+
+                    if (downloadMsg != null) {
+                        Text(
+                            text = downloadMsg!!,
+                            color = GreenPrimary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                     OutlinedButton(
@@ -465,7 +484,7 @@ fun ProfileContextSwitcher(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                .fillMaxWidth(0.9f)
+                .fillMaxWidth()
                 .background(White)
         ) {
             profiles.forEach { profile ->

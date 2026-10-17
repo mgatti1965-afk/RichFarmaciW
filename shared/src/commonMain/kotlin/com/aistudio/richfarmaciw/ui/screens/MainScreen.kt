@@ -1,13 +1,13 @@
 package com.aistudio.richfarmaciw.ui.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
@@ -57,32 +57,41 @@ fun MainScreen(viewModel: MainViewModel) {
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (isConfigured && !showSettings) {
-                NavigationBar(
-                    containerColor = Color.White,
-                    contentColor = GreenPrimary
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.White,
+                    shadowElevation = 8.dp
                 ) {
-                    NavigationBarItem(
-                        selected = currentTab == 0,
-                        onClick = { viewModel.selectTab(0) },
-                        icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = stringResource(Res.string.request_title)) },
-                        label = { Text(stringResource(Res.string.request_title)) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = GreenPrimary,
-                            selectedTextColor = GreenPrimary,
-                            indicatorColor = GreenPrimary.copy(alpha = 0.1f)
-                        )
-                    )
-                    NavigationBarItem(
-                        selected = currentTab == 1,
-                        onClick = { viewModel.selectTab(1) },
-                        icon = { Icon(Icons.Default.History, contentDescription = stringResource(Res.string.history_title)) },
-                        label = { Text(stringResource(Res.string.history_title)) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = GreenPrimary,
-                            selectedTextColor = GreenPrimary,
-                            indicatorColor = GreenPrimary.copy(alpha = 0.1f)
-                        )
-                    )
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        NavigationBar(
+                            modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth(),
+                            containerColor = Color.White,
+                            contentColor = GreenPrimary
+                        ) {
+                            NavigationBarItem(
+                                selected = currentTab == 0,
+                                onClick = { viewModel.selectTab(0) },
+                                icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = stringResource(Res.string.request_title)) },
+                                label = { Text(stringResource(Res.string.request_title)) },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = GreenPrimary,
+                                    selectedTextColor = GreenPrimary,
+                                    indicatorColor = GreenPrimary.copy(alpha = 0.1f)
+                                )
+                            )
+                            NavigationBarItem(
+                                selected = currentTab == 1,
+                                onClick = { viewModel.selectTab(1) },
+                                icon = { Icon(Icons.Default.History, contentDescription = stringResource(Res.string.history_title)) },
+                                label = { Text(stringResource(Res.string.history_title)) },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = GreenPrimary,
+                                    selectedTextColor = GreenPrimary,
+                                    indicatorColor = GreenPrimary.copy(alpha = 0.1f)
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }

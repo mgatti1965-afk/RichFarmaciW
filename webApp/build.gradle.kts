@@ -9,6 +9,7 @@ plugins {
 
 kotlin {
     js {
+        outputModuleName.set("webApp")
         browser {
             commonWebpackConfig {
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
@@ -22,6 +23,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
+        outputModuleName.set("webApp")
         browser {
             commonWebpackConfig {
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {

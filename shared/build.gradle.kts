@@ -15,13 +15,17 @@ ksp {
 
 kotlin {
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "Shared"
-            isStatic = true
+    val isMac = System.getProperty("os.name").contains("Mac", ignoreCase = true)
+
+    if (isMac) {
+        listOf(
+            iosArm64(),
+            iosSimulatorArm64()
+        ).forEach { iosTarget ->
+            iosTarget.binaries.framework {
+                baseName = "Shared"
+                isStatic = true
+            }
         }
     }
     
@@ -89,8 +93,10 @@ kotlin {
             dependsOn(roomTargetsMain)
         }
 
-        val iosMain by creating {
-            dependsOn(roomTargetsMain)
+        if (isMac) {
+            val iosMain by creating {
+                dependsOn(roomTargetsMain)
+            }
         }
 
         val webMain by creating {
@@ -113,8 +119,10 @@ kotlin {
 dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspJvm", libs.androidx.room.compiler)
-    add("kspIosArm64", libs.androidx.room.compiler)
-    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    if (System.getProperty("os.name").contains("Mac", ignoreCase = true)) {
+        add("kspIosArm64", libs.androidx.room.compiler)
+        add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    }
 }
 
 android {

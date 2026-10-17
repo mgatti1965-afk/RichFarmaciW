@@ -103,7 +103,7 @@ fun RequestScreen(
     if (showDonation) {
         DonationDialog(
             donationCount = donationCount,
-            appName = "RichFarmaciW",
+            appName = "RichFarmaci",
             onDismiss = { showDonation = false },
             onConfirm = {
                 viewModel.incrementDonationCount()
@@ -114,106 +114,116 @@ fun RequestScreen(
         )
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(GrayBackground)) {
+    Column(
+        modifier = Modifier.fillMaxSize().background(GrayBackground),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         // Top Bar
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = White,
             shadowElevation = 2.dp
         ) {
-            Column {
-                Row(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(Res.drawable.app_icon),
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp),
-                            tint = Color.Unspecified
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "RichFarmaciW",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = GreenPrimary
-                        )
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        IconButton(onClick = { showDonation = true }) {
-                            Icon(Icons.Default.Coffee, contentDescription = "Dona", tint = if(donationCount > 0) GreenPrimary else Slate600)
-                        }
-                        IconButton(onClick = { showHelp = true }) {
-                            Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
-                        }
-                        IconButton(onClick = { viewModel.setShowSettings(true) }) {
-                            Icon(Icons.Default.Settings, contentDescription = "Impostazioni", tint = Slate900)
-                        }
-                    }
-                }
-
-                ProfileContextSwitcher(
-                    profiles = profiles,
-                    activeProfile = activeProfile,
-                    onProfileSelected = { viewModel.selectProfile(it) }
-                )
-            }
-        }
-
-        LazyColumn(
-            modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(vertical = 16.dp)
-        ) {
-            item {
-                Text(
-                    text = "Seleziona i farmaci da richiedere:",
-                    fontWeight = FontWeight.Bold,
-                    color = Slate900,
-                    fontSize = 17.sp,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-            }
-
-            val activeMeds = medications.filter { !it.inPausa }
-            if (activeMeds.isEmpty()) {
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
-                        colors = CardDefaults.cardColors(containerColor = White),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(1.dp, GrayBorder)
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Column(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(
-                            modifier = Modifier.padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(Icons.Default.Info, contentDescription = null, tint = GreenPrimary.copy(alpha = 0.5f), modifier = Modifier.size(48.dp))
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text("Nessun farmaco attivo.", fontWeight = FontWeight.Bold, color = Slate900)
-                            Text("Aggiungili nelle impostazioni per iniziare.", textAlign = TextAlign.Center, color = Slate600)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.MedicalServices,
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp),
+                                tint = GreenPrimary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "RichFarmaci",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = GreenPrimary
+                            )
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            IconButton(onClick = { showDonation = true }) {
+                                Icon(Icons.Default.Coffee, contentDescription = "Dona", tint = if(donationCount > 0) GreenPrimary else Slate600)
+                            }
+                            IconButton(onClick = { showHelp = true }) {
+                                Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
+                            }
+                            IconButton(onClick = { viewModel.setShowSettings(true) }) {
+                                Icon(Icons.Default.Settings, contentDescription = "Impostazioni", tint = Slate900)
+                            }
                         }
                     }
-                }
-            } else {
-                items(activeMeds, key = { it.id }) { med ->
-                    val isSelected = selectedIds.contains(med.id)
-                    val qty = selectedQuantities[med.id] ?: med.scatole.coerceAtLeast(1)
 
-                    MedicationRequestRow(
-                        med = med,
-                        isSelected = isSelected,
-                        quantity = qty,
-                        onToggle = { viewModel.toggleMedicationSelection(med) },
-                        onQtyChange = { viewModel.setQuantityForMedication(med.id, it) }
+                    ProfileContextSwitcher(
+                        profiles = profiles,
+                        activeProfile = activeProfile,
+                        onProfileSelected = { viewModel.selectProfile(it) }
                     )
                 }
             }
+        }
 
-            item { Spacer(modifier = Modifier.height(80.dp)) }
+        Box(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            LazyColumn(
+                modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(vertical = 16.dp)
+            ) {
+                item {
+                    Text(
+                        text = "Seleziona i farmaci da richiedere:",
+                        fontWeight = FontWeight.Bold,
+                        color = Slate900,
+                        fontSize = 17.sp,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                }
+
+                val activeMeds = medications.filter { !it.inPausa }
+                if (activeMeds.isEmpty()) {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
+                            colors = CardDefaults.cardColors(containerColor = White),
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, GrayBorder)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(Icons.Default.Info, contentDescription = null, tint = GreenPrimary.copy(alpha = 0.5f), modifier = Modifier.size(48.dp))
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text("Nessun farmaco attivo.", fontWeight = FontWeight.Bold, color = Slate900)
+                                Text("Aggiungili nelle impostazioni per iniziare.", textAlign = TextAlign.Center, color = Slate600)
+                            }
+                        }
+                    }
+                } else {
+                    items(activeMeds, key = { it.id }) { med ->
+                        val isSelected = selectedIds.contains(med.id)
+                        val qty = selectedQuantities[med.id] ?: med.scatole.coerceAtLeast(1)
+
+                        MedicationRequestRow(
+                            med = med,
+                            isSelected = isSelected,
+                            quantity = qty,
+                            onToggle = { viewModel.toggleMedicationSelection(med) },
+                            onQtyChange = { viewModel.setQuantityForMedication(med.id, it) }
+                        )
+                    }
+                }
+
+                item { Spacer(modifier = Modifier.height(80.dp)) }
+            }
         }
 
         // Action Buttons
@@ -223,26 +233,28 @@ fun RequestScreen(
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             shadowElevation = 10.dp
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                if (selectedIds.isNotEmpty()) {
-                    Button(
-                        onClick = { showPreviewDialog = true },
-                        modifier = Modifier.fillMaxWidth().height(54.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                        shape = RoundedCornerShape(14.dp)
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = White)
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text("INVIA RICHIESTA AL MEDICO", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                    }
-                } else {
-                    OutlinedButton(
-                        onClick = { showQuickMsgDialog = true },
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        border = BorderStroke(1.5.dp, GreenPrimary),
-                        shape = RoundedCornerShape(14.dp)
-                    ) {
-                        Text("Messaggio veloce al Medico", color = GreenPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Column(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(16.dp)) {
+                    if (selectedIds.isNotEmpty()) {
+                        Button(
+                            onClick = { showPreviewDialog = true },
+                            modifier = Modifier.fillMaxWidth().height(54.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
+                            shape = RoundedCornerShape(14.dp)
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = White)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text("INVIA RICHIESTA AL MEDICO", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        }
+                    } else {
+                        OutlinedButton(
+                            onClick = { showQuickMsgDialog = true },
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                            border = BorderStroke(1.5.dp, GreenPrimary),
+                            shape = RoundedCornerShape(14.dp)
+                        ) {
+                            Text("Messaggio veloce al Medico", color = GreenPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        }
                     }
                 }
             }

@@ -8,6 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -158,58 +160,74 @@ fun SettingsPanelContent(
         )
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(GrayBackground)) {
-        Column(modifier = Modifier.fillMaxWidth().background(White).padding(16.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                    Icon(
-                        painter = painterResource(Res.drawable.app_icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(32.dp),
-                        tint = Color.Unspecified
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                        Text(
-                            text = "⚙️ Configurazione",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Slate900,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        if (isNewProfile) {
-                            Text(text = "CREAZIONE NUOVO PROFILO", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = GreenPrimary)
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    IconButton(onClick = { showBackupDialog = true }, modifier = Modifier.background(GrayBackground, CircleShape)) {
-                        Icon(Icons.Default.CloudUpload, contentDescription = "Backup", tint = GreenPrimary)
-                    }
-                    IconButton(onClick = { showHelp = true }, modifier = Modifier.background(GrayBackground, CircleShape)) {
-                        Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
-                    }
-                    IconButton(
-                        onClick = {
-                            if (hasChanges && !exitAttempted) {
-                                showWarningBanner = true
-                                exitAttempted = true
-                            } else {
-                                onClose()
+    Column(
+        modifier = Modifier.fillMaxSize().background(GrayBackground),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = White,
+            shadowElevation = 2.dp
+        ) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Column(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(16.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp),
+                                tint = GreenPrimary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text(
+                                    text = "Configurazione",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Slate900,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                if (isNewProfile) {
+                                    Text(text = "CREAZIONE NUOVO PROFILO", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = GreenPrimary)
+                                }
                             }
-                        },
-                        modifier = Modifier.background(GrayBackground, CircleShape)
-                    ) {
-                        Icon(Icons.Default.Close, contentDescription = "Chiudi", tint = Slate900)
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            IconButton(onClick = { showBackupDialog = true }, modifier = Modifier.background(GrayBackground, CircleShape)) {
+                                Icon(Icons.Default.CloudUpload, contentDescription = "Backup", tint = GreenPrimary)
+                            }
+                            IconButton(onClick = { showHelp = true }, modifier = Modifier.background(GrayBackground, CircleShape)) {
+                                Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
+                            }
+                            IconButton(
+                                onClick = {
+                                    if (hasChanges && !exitAttempted) {
+                                        showWarningBanner = true
+                                        exitAttempted = true
+                                    } else {
+                                        onClose()
+                                    }
+                                },
+                                modifier = Modifier.background(GrayBackground, CircleShape)
+                            ) {
+                                Icon(Icons.Default.Close, contentDescription = "Chiudi", tint = Slate900)
+                            }
+                        }
                     }
                 }
             }
         }
         HorizontalDivider(color = GrayBorder)
 
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp), contentPadding = PaddingValues(vertical = 16.dp)) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            LazyColumn(
+                modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(vertical = 16.dp)
+            ) {
             item {
                 ProfileContextSwitcher(
                     profiles = profiles,
@@ -420,6 +438,7 @@ fun SettingsPanelContent(
             item { Spacer(modifier = Modifier.height(32.dp)) }
         }
     }
+}
 
     if (showAddProfileDialog) {
         AlertDialog(
@@ -540,20 +559,6 @@ fun ConfigurationMedicationRow(
                         color = if (med.inPausa) Slate600 else Slate900,
                         fontSize = 16.sp
                     )
-                    if (med.inPausa) {
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = OrangeAlert.copy(alpha = 0.15f)
-                        ) {
-                            Text(
-                                text = "IN PAUSA",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = OrangeAlert,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-                    }
                 }
                 if (med.note.isNotBlank()) {
                     Text(text = med.note, fontSize = 13.sp, color = Slate600)
@@ -565,17 +570,48 @@ fun ConfigurationMedicationRow(
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(top = 2.dp)
                 )
+                if (notificationsEnabled && med.notificaAttiva) {
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = GreenPrimary.copy(alpha = 0.12f),
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Notifications,
+                                contentDescription = null,
+                                tint = GreenPrimary,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Notifica ore ${med.orarioNotifica}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = GreenPrimary
+                            )
+                        }
+                    }
+                }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                IconButton(
-                    onClick = onToggleStandby,
-                    modifier = Modifier.size(34.dp).background(GrayBackground, CircleShape)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    modifier = Modifier.clickable { onToggleStandby() },
+                    shape = RoundedCornerShape(12.dp),
+                    color = if (med.inPausa) GreenPrimary else Color(0xFFD1D5DB)
                 ) {
-                    Icon(
-                        imageVector = if (med.inPausa) Icons.Default.PlayArrow else Icons.Default.Pause,
-                        contentDescription = "Sospendi/Riprendi",
-                        tint = if (med.inPausa) GreenPrimary else Slate600,
-                        modifier = Modifier.size(18.dp)
+                    Text(
+                        text = if (med.inPausa) "Riattiva" else "Pausa",
+                        color = if (med.inPausa) White else Slate900,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
                     )
                 }
                 IconButton(
@@ -591,12 +627,12 @@ fun ConfigurationMedicationRow(
                 }
                 IconButton(
                     onClick = onDelete,
-                    modifier = Modifier.size(34.dp).background(GrayBackground, CircleShape)
+                    modifier = Modifier.size(34.dp).background(Color(0xFFFFEBEE), CircleShape)
                 ) {
                     Icon(
                         Icons.Default.Delete,
                         contentDescription = "Elimina",
-                        tint = Color.Red.copy(alpha = 0.7f),
+                        tint = Color.Red,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -618,12 +654,81 @@ fun MedicationEditorDialog(
     var note by remember { mutableStateOf(medication?.note ?: "") }
     var notificaActiva by remember { mutableStateOf(medication?.notificaAttiva ?: false) }
     var orarioNotifica by remember { mutableStateOf(medication?.orarioNotifica ?: "08:00") }
+    var frequenzaValore by remember { mutableIntStateOf(medication?.frequenzaValore ?: 1) }
+    var frequenzaTipo by remember { mutableStateOf(medication?.frequenzaTipo ?: "GIORNI") }
+    var showHelpDialog by remember { mutableStateOf(false) }
+
+    if (showHelpDialog) {
+        AlertDialog(
+            onDismissRequest = { showHelpDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = null, tint = GreenPrimary)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Guida Farmaco e Notifiche", fontWeight = FontWeight.Bold)
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("• Nome Farmaco: Inserisci il nome commerciale del farmaco.", fontSize = 13.sp)
+                    Text("• N. scatole: Indica quante scatole richiedere standard.", fontSize = 13.sp)
+                    Text("• Note: Aggiungi i dosaggi (es. 1 compressa dopo i pasti).", fontSize = 13.sp)
+                    Text("• Attiva Notifica: Imposta orario e ripetizione (ogni X giorni o ore) per ricevere i promemoria.", fontSize = 13.sp)
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showHelpDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)) {
+                    Text("HO CAPITO", color = White)
+                }
+            },
+            containerColor = White
+        )
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (medication == null) "Nuovo Farmaco" else "Modifica Farmaco", fontWeight = FontWeight.Bold) },
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (medication == null) "Nuovo Farmaco" else "Modifica Farmaco",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    IconButton(
+                        onClick = { showHelpDialog = true },
+                        modifier = Modifier.size(32.dp).background(GreenPrimary.copy(alpha = 0.1f), CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.HelpOutline,
+                            contentDescription = "Aiuto",
+                            tint = GreenPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.size(32.dp).background(GrayBackground, CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Chiudi",
+                            tint = Slate900,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+        },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()).heightIn(max = 480.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 OutlinedTextField(
                     value = nome,
                     onValueChange = { nome = it },
@@ -631,23 +736,164 @@ fun MedicationEditorDialog(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
                 )
-                OutlinedTextField(
-                    value = note,
-                    onValueChange = { note = it },
-                    label = { Text("Note / Dosaggio (Opzionale)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
-                )
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Scatole standard da richiedere:", fontWeight = FontWeight.Medium)
+                    Text("N. scatole:", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Slate900)
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { if (scatole > 1) scatole-- }) { Icon(Icons.Default.Remove, contentDescription = null) }
-                        Text(text = scatole.toString(), fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(horizontal = 8.dp))
-                        IconButton(onClick = { scatole++ }) { Icon(Icons.Default.Add, contentDescription = null) }
+                        IconButton(
+                            onClick = { if (scatole > 1) scatole-- },
+                            modifier = Modifier.size(36.dp).background(Slate900, RoundedCornerShape(8.dp))
+                        ) {
+                            Icon(Icons.Default.Remove, contentDescription = "Meno", tint = White)
+                        }
+                        Text(text = scatole.toString(), fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(horizontal = 12.dp))
+                        IconButton(
+                            onClick = { scatole++ },
+                            modifier = Modifier.size(36.dp).background(GreenPrimary, RoundedCornerShape(8.dp))
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = "Più", tint = White)
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    label = { Text("Note (es: dopo i pasti)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                HorizontalDivider(color = GrayBorder)
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().clickable { notificaActiva = !notificaActiva }.padding(vertical = 4.dp)
+                ) {
+                    Checkbox(
+                        checked = notificaActiva,
+                        onCheckedChange = { notificaActiva = it },
+                        colors = CheckboxDefaults.colors(checkedColor = GreenPrimary)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Attiva Notifica", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Slate900)
+                }
+
+                if (notificaActiva) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("Orari:", fontSize = 13.sp, color = Slate600, fontWeight = FontWeight.Medium)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                border = BorderStroke(1.dp, GrayBorder),
+                                color = White
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                                ) {
+                                    Text(orarioNotifica, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Slate900)
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Icon(Icons.Default.Close, contentDescription = null, tint = Color.Red.copy(alpha = 0.6f), modifier = Modifier.size(16.dp))
+                                }
+                            }
+                            IconButton(
+                                onClick = { /* add time */ },
+                                modifier = Modifier.size(36.dp).background(GreenPrimary, CircleShape)
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = "Aggiungi orario", tint = White)
+                            }
+                        }
+
+                        Text("Ripetizione:", fontSize = 13.sp, color = Slate600, fontWeight = FontWeight.Medium)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                border = BorderStroke(1.dp, GrayBorder)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    IconButton(onClick = { if (frequenzaValore > 1) frequenzaValore-- }, modifier = Modifier.size(32.dp)) {
+                                        Icon(Icons.Default.Remove, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    }
+                                    Text("$frequenzaValore", fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp))
+                                    IconButton(onClick = { frequenzaValore++ }, modifier = Modifier.size(32.dp)) {
+                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            }
+                            Text(if (frequenzaTipo == "ORE") "ore" else "gg", color = Slate900, fontWeight = FontWeight.Medium)
+
+                            Row(modifier = Modifier.padding(start = 8.dp)) {
+                                Surface(
+                                    modifier = Modifier.clickable { frequenzaTipo = "ORE" },
+                                    shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
+                                    color = if (frequenzaTipo == "ORE") GreenPrimary else White,
+                                    border = BorderStroke(1.dp, if (frequenzaTipo == "ORE") GreenPrimary else GrayBorder)
+                                ) {
+                                    Text("Ore", color = if (frequenzaTipo == "ORE") White else Slate900, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+                                }
+                                Surface(
+                                    modifier = Modifier.clickable { frequenzaTipo = "GIORNI" },
+                                    shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
+                                    color = if (frequenzaTipo == "GIORNI") GreenPrimary else White,
+                                    border = BorderStroke(1.dp, if (frequenzaTipo == "GIORNI") GreenPrimary else GrayBorder)
+                                ) {
+                                    Text("GG", color = if (frequenzaTipo == "GIORNI") White else Slate900, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+                                }
+                            }
+                        }
+
+                        // Prossime Notifiche preview cards dynamically computed
+                        val step = frequenzaValore.coerceAtLeast(1)
+                        val unitStr = if (frequenzaTipo == "ORE") "ore" else "gg"
+                        val dynamicPreviews = listOf(
+                            Triple("PROSSIMA", "Domani", orarioNotifica),
+                            Triple("2ª NOTIFICA", "+$step $unitStr", orarioNotifica),
+                            Triple("3ª NOTIFICA", "+${step * 2} $unitStr", orarioNotifica)
+                        )
+
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = GrayBackground.copy(alpha = 0.6f),
+                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("Prossime Notifiche:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Slate600)
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    dynamicPreviews.forEach { item ->
+                                        Card(
+                                            modifier = Modifier.weight(1f),
+                                            colors = CardDefaults.cardColors(containerColor = White),
+                                            border = BorderStroke(1.dp, GrayBorder),
+                                            shape = RoundedCornerShape(10.dp)
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.padding(6.dp).fillMaxWidth(),
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                Text(item.first, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = GreenPrimary, maxLines = 1)
+                                                Text(item.second, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Slate900)
+                                                Text(item.third, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Slate900)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -666,8 +912,8 @@ fun MedicationEditorDialog(
                                 inPausa = medication?.inPausa ?: false,
                                 notificaAttiva = notificaActiva,
                                 orarioNotifica = orarioNotifica,
-                                frequenzaValore = medication?.frequenzaValore ?: 1,
-                                frequenzaTipo = medication?.frequenzaTipo ?: "GIORNI"
+                                frequenzaValore = frequenzaValore,
+                                frequenzaTipo = frequenzaTipo
                             )
                         )
                     }

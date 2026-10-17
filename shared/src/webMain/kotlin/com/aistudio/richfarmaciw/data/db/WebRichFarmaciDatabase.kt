@@ -99,8 +99,12 @@ class WebRichFarmaciDatabase : RichFarmaciDatabase {
 
     override suspend fun insertProfile(profile: Profile) {
         val current = profilesFlow.value.toMutableList()
-        current.removeAll { it.id == profile.id }
-        current.add(profile)
+        val index = current.indexOfFirst { it.id == profile.id }
+        if (index != -1) {
+            current[index] = profile
+        } else {
+            current.add(profile)
+        }
         saveProfiles(current)
     }
 
@@ -133,16 +137,24 @@ class WebRichFarmaciDatabase : RichFarmaciDatabase {
 
     override suspend fun insertMedication(medication: Medication) {
         val current = medicationsFlow.value.toMutableList()
-        current.removeAll { it.id == medication.id }
-        current.add(medication)
+        val index = current.indexOfFirst { it.id == medication.id }
+        if (index != -1) {
+            current[index] = medication
+        } else {
+            current.add(medication)
+        }
         saveMedications(current)
     }
 
     override suspend fun insertAllMedications(medications: List<Medication>) {
         val current = medicationsFlow.value.toMutableList()
         medications.forEach { med ->
-            current.removeAll { it.id == med.id }
-            current.add(med)
+            val index = current.indexOfFirst { it.id == med.id }
+            if (index != -1) {
+                current[index] = med
+            } else {
+                current.add(med)
+            }
         }
         saveMedications(current)
     }
@@ -168,8 +180,12 @@ class WebRichFarmaciDatabase : RichFarmaciDatabase {
 
     override suspend fun insertSentRequest(sentRequest: SentRequest) {
         val current = sentRequestsFlow.value.toMutableList()
-        current.removeAll { it.id == sentRequest.id }
-        current.add(0, sentRequest)
+        val index = current.indexOfFirst { it.id == sentRequest.id }
+        if (index != -1) {
+            current[index] = sentRequest
+        } else {
+            current.add(0, sentRequest)
+        }
         saveSentRequests(current)
     }
 

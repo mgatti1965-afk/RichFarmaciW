@@ -132,13 +132,8 @@ fun RequestScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.MedicalServices,
-                                contentDescription = null,
-                                modifier = Modifier.size(32.dp),
-                                tint = GreenPrimary
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            PharmacyCross(modifier = Modifier.size(28.dp), color = GreenPrimary)
+                            Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = "RichFarmaci",
                                 fontSize = 20.sp,

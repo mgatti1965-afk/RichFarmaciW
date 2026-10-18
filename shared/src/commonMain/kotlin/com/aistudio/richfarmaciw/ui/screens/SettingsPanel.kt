@@ -952,7 +952,8 @@ fun MedicationEditorDialog(
 }
 
 private fun calculateNotificationPreviewTime(baseTime: String, addHours: Int): Pair<String, String> {
-    val parts = baseTime.split(":")
+    val cleanTime = baseTime.split(",").firstOrNull()?.trim() ?: baseTime
+    val parts = cleanTime.split(":")
     val h = parts.getOrNull(0)?.toIntOrNull() ?: 8
     val m = parts.getOrNull(1)?.toIntOrNull() ?: 0
     val totalHours = h + addHours

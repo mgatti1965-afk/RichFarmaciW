@@ -413,7 +413,7 @@ fun SettingsPanelContent(
                     ) {
                         Icon(Icons.Default.Add, contentDescription = null, tint = White)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("NUOVO FARMACO/NOTIFICA", fontWeight = FontWeight.Bold, color = White)
+                        Text("NUOVO FARMACO", fontWeight = FontWeight.Bold, color = White)
                     }
                 }
                 item { Text("I Tuoi Farmaci Salvati:", fontWeight = FontWeight.Bold, color = Slate900, modifier = Modifier.padding(top = 8.dp)) }
@@ -673,7 +673,9 @@ fun MedicationEditorDialog(
                     Text("• Nome Farmaco: Inserisci il nome commerciale del farmaco.", fontSize = 13.sp)
                     Text("• N. scatole: Indica quante scatole richiedere standard.", fontSize = 13.sp)
                     Text("• Note: Aggiungi i dosaggi (es. 1 compressa dopo i pasti).", fontSize = 13.sp)
-                    Text("• Attiva Notifica: Imposta orario e ripetizione (ogni X giorni o ore) per ricevere i promemoria.", fontSize = 13.sp)
+                    if (notificationsEnabled) {
+                        Text("• Attiva Notifica: Imposta orario e ripetizione (ogni X giorni o ore) per ricevere i promemoria.", fontSize = 13.sp)
+                    }
                 }
             },
             confirmButton = {
@@ -768,22 +770,23 @@ fun MedicationEditorDialog(
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                HorizontalDivider(color = GrayBorder)
+                if (notificationsEnabled) {
+                    HorizontalDivider(color = GrayBorder)
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().clickable { notificaActiva = !notificaActiva }.padding(vertical = 4.dp)
-                ) {
-                    Checkbox(
-                        checked = notificaActiva,
-                        onCheckedChange = { notificaActiva = it },
-                        colors = CheckboxDefaults.colors(checkedColor = GreenPrimary)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Attiva Notifica", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Slate900)
-                }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().clickable { notificaActiva = !notificaActiva }.padding(vertical = 4.dp)
+                    ) {
+                        Checkbox(
+                            checked = notificaActiva,
+                            onCheckedChange = { notificaActiva = it },
+                            colors = CheckboxDefaults.colors(checkedColor = GreenPrimary)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Attiva Notifica", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Slate900)
+                    }
 
-                if (notificaActiva) {
+                    if (notificaActiva) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text("Orari:", fontSize = 13.sp, color = Slate600, fontWeight = FontWeight.Medium)
                         Row(
@@ -897,7 +900,8 @@ fun MedicationEditorDialog(
                     }
                 }
             }
-        },
+        }
+    },
         confirmButton = {
             Button(
                 onClick = {
@@ -910,7 +914,7 @@ fun MedicationEditorDialog(
                                 scatole = scatole,
                                 note = note.trim(),
                                 inPausa = medication?.inPausa ?: false,
-                                notificaAttiva = notificaActiva,
+                                notificaAttiva = if (notificationsEnabled) notificaActiva else false,
                                 orarioNotifica = orarioNotifica,
                                 frequenzaValore = frequenzaValore,
                                 frequenzaTipo = frequenzaTipo

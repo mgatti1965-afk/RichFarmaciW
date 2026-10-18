@@ -2,9 +2,11 @@ package com.aistudio.richfarmaciw.util
 
 import kotlinx.browser.document
 import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.url.URL
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
+import org.w3c.files.FileReader
 
 actual fun saveBackupFile(fileName: String, content: String, context: Any?): Boolean {
     return try {
@@ -20,5 +22,32 @@ actual fun saveBackupFile(fileName: String, content: String, context: Any?): Boo
         true
     } catch (_: Exception) {
         false
+    }
+}
+
+actual fun readBackupFile(context: Any?, onResult: (String?) -> Unit) {
+    try {
+        val input = document.createElement("input") as HTMLInputElement
+        input.type = "file"
+        input.accept = ".json,application/json"
+        input.onchange = {
+            val file = input.files?.item(0)
+            if (file != null) {
+                val reader = FileReader()
+                reader.onload = {
+                    val text = reader.result as? String
+                    onResult(text)
+                }
+                reader.onerror = {
+                    onResult(null)
+                }
+                reader.readAsText(file)
+            } else {
+                onResult(null)
+            }
+        }
+        input.click()
+    } catch (_: Exception) {
+        onResult(null)
     }
 }

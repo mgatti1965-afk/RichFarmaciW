@@ -24,6 +24,7 @@ import com.aistudio.richfarmaciw.data.model.Profile
 import com.aistudio.richfarmaciw.ui.theme.*
 import com.aistudio.richfarmaciw.ui.viewmodel.MainViewModel
 import com.aistudio.richfarmaciw.util.saveBackupFile
+import com.aistudio.richfarmaciw.util.readBackupFile
 import org.jetbrains.compose.resources.painterResource
 import richfarmaciw.shared.generated.resources.*
 
@@ -292,11 +293,9 @@ fun BackupDialog(
     onDismiss: () -> Unit,
     onImportSuccess: () -> Unit
 ) {
-    var backupJson by remember { mutableStateOf("") }
-    var showImportArea by remember { mutableStateOf(false) }
     var errorMsg by remember { mutableStateOf<String?>(null) }
     var downloadMsg by remember { mutableStateOf<String?>(null) }
-    val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
+    var isProcessing by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -310,96 +309,91 @@ fun BackupDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
-                    "Usa questa funzione per spostare i tuoi dati su un altro dispositivo o per salvarne una copia di sicurezza.",
+                    "Usa questa funzione per scaricare un file con tutti i dati o per ripristinarli dalla cartella Download.",
                     fontSize = 14.sp,
                     color = Slate600
                 )
 
-                if (!showImportArea) {
-                    Button(
-                        onClick = {
-                            viewModel.exportBackup { json ->
-                                val fileName = "backup_richfarmaci.json"
-                                val saved = saveBackupFile(fileName, json)
-                                if (saved) {
-                                    downloadMsg = "File salvato nei Download!"
-                                } else {
-                                    clipboardManager.setText(AnnotatedString(json))
-                                    downloadMsg = "Copiato negli appunti!"
-                                }
+                Button(
+                    onClick = {
+                        isProcessing = true
+                        errorMsg = null
+                        downloadMsg = null
+                        viewModel.exportBackup { json ->
+                            val fileName = "backup_richfarmaci.json"
+                            val saved = saveBackupFile(fileName, json)
+                            isProcessing = false
+                            if (saved) {
+                                downloadMsg = "File 'backup_richfarmaci.json' salvato in Download!"
+                            } else {
+                                errorMsg = "Errore durante il salvataggio del file."
                             }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(Icons.Default.Download, contentDescription = null, tint = White)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("SCARICA FILE (JSON)", color = White)
-                    }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = !isProcessing
+                ) {
+                    Icon(Icons.Default.Download, contentDescription = null, tint = White)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("SCARICA FILE (JSON)", color = White)
+                }
 
-                    if (downloadMsg != null) {
-                        Text(
-                            text = downloadMsg!!,
-                            color = GreenPrimary,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    OutlinedButton(
-                        onClick = { showImportArea = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        border = BorderStroke(1.dp, GreenPrimary),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("IMPORTA DA TESTO", color = GreenPrimary)
-                    }
-                } else {
-                    OutlinedTextField(
-                        value = backupJson,
-                        onValueChange = { backupJson = it; errorMsg = null },
-                        label = { Text("Incolla qui il codice JSON") },
-                        modifier = Modifier.fillMaxWidth().height(150.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp)
-                    )
-
-                    if (errorMsg != null) {
-                        Text(errorMsg!!, color = Color.Red, fontSize = 12.sp)
-                    }
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(
-                            onClick = {
-                                if (backupJson.isNotBlank()) {
-                                    viewModel.importBackup(backupJson) { success ->
-                                        if (success) {
-                                            onImportSuccess()
-                                        } else {
-                                            errorMsg = "Errore: Formato non valido."
-                                        }
+                Button(
+                    onClick = {
+                        isProcessing = true
+                        errorMsg = null
+                        downloadMsg = null
+                        readBackupFile { jsonContent ->
+                            if (!jsonContent.isNullOrBlank()) {
+                                viewModel.importBackup(jsonContent) { success ->
+                                    isProcessing = false
+                                    if (success) {
+                                        onImportSuccess()
+                                    } else {
+                                        errorMsg = "Errore: File di backup non valido o corrotto."
                                     }
                                 }
-                            },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text("RIPRISTINA ORA", color = White)
+                            } else {
+                                isProcessing = false
+                                errorMsg = "Nessun file di backup trovato nella cartella Download."
+                            }
                         }
-                        TextButton(onClick = { showImportArea = false }) {
-                            Text("INDIETRO", color = Slate600)
-                        }
-                    }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Slate900),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = !isProcessing
+                ) {
+                    Icon(Icons.Default.Upload, contentDescription = null, tint = White)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("IMPORTA FILE", color = White)
+                }
+
+                if (downloadMsg != null) {
+                    Text(
+                        text = downloadMsg!!,
+                        color = GreenPrimary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                if (errorMsg != null) {
+                    Text(
+                        text = errorMsg!!,
+                        color = Color.Red,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         },
-        confirmButton = {
-            if (!showImportArea) {
-                TextButton(onClick = onDismiss) {
-                    Text("CHIUDI", color = Slate600)
-                }
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("CHIUDI", color = Slate600)
             }
         },
         shape = RoundedCornerShape(20.dp),

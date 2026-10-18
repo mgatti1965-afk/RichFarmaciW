@@ -13,3 +13,20 @@ actual fun saveBackupFile(fileName: String, content: String, context: Any?): Boo
         false
     }
 }
+
+actual fun readBackupFile(context: Any?, onResult: (String?) -> Unit) {
+    try {
+        val downloadsDir = File(System.getProperty("user.home"), "Downloads")
+        val file = downloadsDir.listFiles()
+            ?.filter { it.name.contains("backup_richfarmaci") && it.name.endsWith(".json") }
+            ?.maxByOrNull { it.lastModified() }
+            ?: File(downloadsDir, "backup_richfarmaci.json")
+        if (file.exists() && file.canRead()) {
+            onResult(file.readText())
+        } else {
+            onResult(null)
+        }
+    } catch (_: Exception) {
+        onResult(null)
+    }
+}

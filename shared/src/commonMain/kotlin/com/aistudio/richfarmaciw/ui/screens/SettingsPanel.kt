@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -177,7 +178,7 @@ fun SettingsPanelContent(
                                 imageVector = Icons.Default.Settings,
                                 contentDescription = null,
                                 modifier = Modifier.size(32.dp),
-                                tint = GreenPrimary
+                                tint = Slate900
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Column {
@@ -197,7 +198,7 @@ fun SettingsPanelContent(
                         Spacer(modifier = Modifier.width(4.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             IconButton(onClick = { showBackupDialog = true }, modifier = Modifier.background(GrayBackground, CircleShape)) {
-                                Icon(Icons.Default.CloudUpload, contentDescription = "Backup", tint = GreenPrimary)
+                                Icon(Icons.Default.CloudUpload, contentDescription = "Backup", tint = Slate900)
                             }
                             IconButton(onClick = { showHelp = true }, modifier = Modifier.background(GrayBackground, CircleShape)) {
                                 Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
@@ -358,8 +359,10 @@ fun SettingsPanelContent(
                         }
                     }
 
+                    val focusManager = LocalFocusManager.current
                     Button(
                         onClick = {
+                            focusManager.clearFocus()
                             val missingFields = mutableListOf<String>()
                             if (pNome.isBlank()) missingFields.add("Nome Paziente")
                             if (pCf.isBlank()) missingFields.add("Codice Fiscale")
@@ -728,7 +731,7 @@ fun MedicationEditorDialog(
         },
         text = {
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()).heightIn(max = 480.dp),
+                modifier = Modifier.verticalScroll(rememberScrollState()).heightIn(max = 580.dp).padding(bottom = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedTextField(
@@ -868,10 +871,10 @@ fun MedicationEditorDialog(
                         Surface(
                             shape = RoundedCornerShape(12.dp),
                             color = GrayBackground.copy(alpha = 0.6f),
-                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 4.dp)
                         ) {
                             Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Prossime Notifiche:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Slate600)
+                                Text("Prossime Notifiche:", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Slate900)
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -885,7 +888,7 @@ fun MedicationEditorDialog(
                                             shape = RoundedCornerShape(10.dp)
                                         ) {
                                             Column(
-                                                modifier = Modifier.padding(6.dp).fillMaxWidth(),
+                                                modifier = Modifier.padding(vertical = 6.dp, horizontal = 2.dp).fillMaxWidth(),
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
                                                 Text(item.first, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = GreenPrimary, maxLines = 1)

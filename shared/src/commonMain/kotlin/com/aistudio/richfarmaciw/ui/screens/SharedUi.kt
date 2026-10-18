@@ -362,7 +362,7 @@ fun BackupDialog(
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Slate900),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)),
                     shape = RoundedCornerShape(12.dp),
                     enabled = !isProcessing
                 ) {
@@ -483,13 +483,14 @@ fun ProfileContextSwitcher(
         ) {
             profiles.forEach { profile ->
                 DropdownMenuItem(
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
                     text = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(profile.pazienteNome, color = Slate900, fontWeight = if(profile.id == activeProfile?.id) FontWeight.Bold else FontWeight.Normal)
+                            Text(profile.pazienteNome, color = Slate900, fontSize = 14.sp, fontWeight = if(profile.id == activeProfile?.id) FontWeight.Bold else FontWeight.Normal)
                             if (onDeleteProfile != null && profiles.size > 1) {
                                 IconButton(
                                     onClick = {
@@ -498,7 +499,7 @@ fun ProfileContextSwitcher(
                                     },
                                     modifier = Modifier.size(24.dp)
                                 ) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color.Red.copy(alpha = 0.6f), modifier = Modifier.size(20.dp))
+                                    Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color.Red.copy(alpha = 0.6f), modifier = Modifier.size(18.dp))
                                 }
                             }
                         }
@@ -512,11 +513,12 @@ fun ProfileContextSwitcher(
             if (onAddProfile != null) {
                 HorizontalDivider(color = GrayBorder.copy(alpha = 0.5f))
                 DropdownMenuItem(
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Add, contentDescription = null, tint = GreenPrimary)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Aggiungi nuovo paziente", color = GreenPrimary, fontWeight = FontWeight.Bold)
+                            Icon(Icons.Default.Add, contentDescription = null, tint = GreenPrimary, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Aggiungi nuovo paziente", color = GreenPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         }
                     },
                     onClick = {

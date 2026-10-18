@@ -414,43 +414,44 @@ fun ProfileContextSwitcher(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        contentAlignment = Alignment.Center
     ) {
         Surface(
             onClick = { expanded = true },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth(),
+            shape = RoundedCornerShape(14.dp),
             color = GreenLightBg.copy(alpha = 0.6f),
             border = BorderStroke(1.dp, GreenPrimary.copy(alpha = 0.3f)),
             shadowElevation = 0.dp
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                     Surface(
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(8.dp),
                         color = GreenPrimary.copy(alpha = 0.15f),
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(32.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
                                 tint = GreenPrimary,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             text = activeProfile?.pazienteNome?.ifBlank { "Seleziona Profilo" } ?: "Seleziona Profilo",
-                            fontSize = 16.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Slate900,
                             maxLines = 1,
@@ -458,7 +459,7 @@ fun ProfileContextSwitcher(
                         )
                         Text(
                             text = if (activeProfile?.pazienteCf?.isNotBlank() == true) "C.F. ${activeProfile.pazienteCf}" else "Paziente attivo",
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             color = Slate600,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -469,7 +470,7 @@ fun ProfileContextSwitcher(
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
                     tint = GreenPrimary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
@@ -478,28 +479,38 @@ fun ProfileContextSwitcher(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
+                .widthIn(max = 380.dp)
                 .fillMaxWidth()
                 .background(White)
         ) {
             profiles.forEach { profile ->
                 DropdownMenuItem(
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp),
+                    modifier = Modifier.heightIn(min = 36.dp),
                     text = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(profile.pazienteNome, color = Slate900, fontSize = 14.sp, fontWeight = if(profile.id == activeProfile?.id) FontWeight.Bold else FontWeight.Normal)
+                            Text(
+                                profile.pazienteNome,
+                                color = Slate900,
+                                fontSize = 13.sp,
+                                fontWeight = if(profile.id == activeProfile?.id) FontWeight.Bold else FontWeight.Normal,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
                             if (onDeleteProfile != null && profiles.size > 1) {
                                 IconButton(
                                     onClick = {
                                         onDeleteProfile(profile)
                                         expanded = false
                                     },
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(22.dp)
                                 ) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color.Red.copy(alpha = 0.6f), modifier = Modifier.size(18.dp))
+                                    Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color.Red.copy(alpha = 0.6f), modifier = Modifier.size(16.dp))
                                 }
                             }
                         }
@@ -513,10 +524,11 @@ fun ProfileContextSwitcher(
             if (onAddProfile != null) {
                 HorizontalDivider(color = GrayBorder.copy(alpha = 0.5f))
                 DropdownMenuItem(
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp),
+                    modifier = Modifier.heightIn(min = 36.dp),
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Add, contentDescription = null, tint = GreenPrimary, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Add, contentDescription = null, tint = GreenPrimary, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text("Aggiungi nuovo paziente", color = GreenPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         }

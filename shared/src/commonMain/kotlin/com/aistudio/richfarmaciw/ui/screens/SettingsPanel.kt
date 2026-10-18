@@ -861,12 +861,25 @@ fun MedicationEditorDialog(
 
                         // Prossime Notifiche preview cards dynamically computed
                         val step = frequenzaValore.coerceAtLeast(1)
-                        val unitStr = if (frequenzaTipo == "ORE") "ore" else "gg"
-                        val dynamicPreviews = listOf(
-                            Triple("PROSSIMA", "Domani", orarioNotifica),
-                            Triple("2ª NOTIFICA", "+$step $unitStr", orarioNotifica),
-                            Triple("3ª NOTIFICA", "+${step * 2} $unitStr", orarioNotifica)
-                        )
+                        val dynamicPreviews = if (frequenzaTipo == "ORE") {
+                            val (d1, t1) = calculateNotificationPreviewTime(orarioNotifica, 0)
+                            val (d2, t2) = calculateNotificationPreviewTime(orarioNotifica, step)
+                            val (d3, t3) = calculateNotificationPreviewTime(orarioNotifica, step * 2)
+                            listOf(
+                                Triple("PROSSIMA", d1, t1),
+                                Triple("2ª NOTIFICA", d2, t2),
+                                Triple("3ª NOTIFICA", d3, t3)
+                            )
+                        } else {
+                            val d1 = "Oggi"
+                            val d2 = if (step == 1) "Domani" else "+$step gg"
+                            val d3 = if (step == 1) "+2 gg" else "+${step * 2} gg"
+                            listOf(
+                                Triple("PROSSIMA", d1, orarioNotifica),
+                                Triple("2ª NOTIFICA", d2, orarioNotifica),
+                                Triple("3ª NOTIFICA", d3, orarioNotifica)
+                            )
+                        }
 
                         Surface(
                             shape = RoundedCornerShape(12.dp),
@@ -936,4 +949,26 @@ fun MedicationEditorDialog(
         },
         containerColor = White
     )
+}
+
+private fun calculateNotificationPreviewTime(baseTime: String, addHours: Int): Pair<String, String> {
+    val parts = baseTime.split(":")
+    val h = parts.getOrNull(0)?.toIntOrNull() ?: 8
+    val m = parts.getOrNull(1)?.toIntOrNull() ?: 0
+    val totalHours = h + addHours
+    val days = totalHours / 24
+    val finalHour = totalHours % 24
+
+    val hh = if (finalHour < 10) "0$finalHour" else "$finalHour"
+    val mm = if (m < 10) "0$m" else "$m"
+    val formattedTime = "$hh:$mm"
+
+    val dayLabel = when {
+        addHours == 0 -> "Oggi"
+        days == 0 -> "+$addHours ore"
+        days == 1 -> "Domani"
+        else -> "+$days gg"
+    }
+
+    return Pair(dayLabel, formattedTime)
 }

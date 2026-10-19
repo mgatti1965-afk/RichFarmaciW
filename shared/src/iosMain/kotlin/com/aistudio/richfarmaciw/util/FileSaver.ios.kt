@@ -31,17 +31,17 @@ actual fun readBackupFile(context: Any?, onResult: (String?) -> Unit) {
             onResult(null)
             return
         }
-        val fileUrl = documentDir.URLByAppendingPathComponent("backup_richfarmaci.json") ?: run {
-            onResult(null)
-            return
+        val possibleNames = listOf("RichFarmaciW_Backup.json", "RichFarmaci_Backup.json", "backup_richfarmaci.json")
+        var content: String? = null
+        for (name in possibleNames) {
+            val fileUrl = documentDir.URLByAppendingPathComponent(name) ?: continue
+            val path = fileUrl.path
+            if (path != null && fileManager.fileExistsAtPath(path)) {
+                content = NSString.stringWithContentsOfFile(path, NSUTF8StringEncoding, null) as? String
+                if (!content.isNullOrBlank()) break
+            }
         }
-        val path = fileUrl.path
-        if (path != null && fileManager.fileExistsAtPath(path)) {
-            val content = NSString.stringWithContentsOfFile(path, NSUTF8StringEncoding, null)
-            onResult(content as? String)
-        } else {
-            onResult(null)
-        }
+        onResult(content)
     } catch (_: Exception) {
         onResult(null)
     }

@@ -18,9 +18,9 @@ actual fun readBackupFile(context: Any?, onResult: (String?) -> Unit) {
     try {
         val downloadsDir = File(System.getProperty("user.home"), "Downloads")
         val file = downloadsDir.listFiles()
-            ?.filter { it.name.contains("backup_richfarmaci") && it.name.endsWith(".json") }
+            ?.filter { it.name.lowercase().contains("richfarmaci") && it.name.endsWith(".json") }
             ?.maxByOrNull { it.lastModified() }
-            ?: File(downloadsDir, "backup_richfarmaci.json")
+            ?: File(downloadsDir, "RichFarmaciW_Backup.json")
         if (file.exists() && file.canRead()) {
             onResult(file.readText())
         } else {

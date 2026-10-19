@@ -55,7 +55,7 @@ actual fun readBackupFile(context: Any?, onResult: (String?) -> Unit) {
             val resolver = ctx.contentResolver
             val projection = arrayOf(MediaStore.Downloads._ID, MediaStore.Downloads.DISPLAY_NAME)
             val selection = "${MediaStore.Downloads.DISPLAY_NAME} LIKE ?"
-            val selectionArgs = arrayOf("%backup_richfarmaci%.json")
+            val selectionArgs = arrayOf("%richfarmaci%.json")
             val sortOrder = "${MediaStore.Downloads.DATE_ADDED} DESC"
 
             resolver.query(
@@ -80,9 +80,9 @@ actual fun readBackupFile(context: Any?, onResult: (String?) -> Unit) {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             if (downloadsDir.exists() && downloadsDir.isDirectory) {
                 val file = downloadsDir.listFiles()
-                    ?.filter { it.name.contains("backup_richfarmaci") && it.name.endsWith(".json") }
+                    ?.filter { it.name.lowercase().contains("richfarmaci") && it.name.endsWith(".json") }
                     ?.maxByOrNull { it.lastModified() }
-                    ?: File(downloadsDir, "backup_richfarmaci.json")
+                    ?: File(downloadsDir, "RichFarmaciW_Backup.json")
                 if (file.exists() && file.canRead()) {
                     content = file.readText()
                 }

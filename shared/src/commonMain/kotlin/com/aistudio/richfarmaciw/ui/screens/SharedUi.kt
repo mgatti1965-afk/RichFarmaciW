@@ -320,11 +320,11 @@ fun BackupDialog(
                         errorMsg = null
                         downloadMsg = null
                         viewModel.exportBackup { json ->
-                            val fileName = "backup_richfarmaci.json"
+                            val fileName = "RichFarmaciW_Backup.json"
                             val saved = saveBackupFile(fileName, json)
                             isProcessing = false
                             if (saved) {
-                                downloadMsg = "File 'backup_richfarmaci.json' salvato in Download!"
+                                downloadMsg = "File 'RichFarmaciW_Backup.json' salvato in Download!"
                             } else {
                                 errorMsg = "Errore durante il salvataggio del file."
                             }

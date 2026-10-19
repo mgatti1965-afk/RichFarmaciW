@@ -9,12 +9,20 @@ import com.aistudio.richfarmaciw.data.model.Profile
 import com.aistudio.richfarmaciw.data.model.SentMedication
 import com.aistudio.richfarmaciw.data.model.SentRequest
 import com.aistudio.richfarmaciw.data.model.AppMetadata
+import com.aistudio.richfarmaciw.data.model.AccountState
+import com.aistudio.richfarmaciw.data.repository.AccountRepository
+import com.aistudio.richfarmaciw.util.CloudSyncManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
 
     private val backupManager = com.aistudio.richfarmaciw.util.BackupManager(db)
+    val accountRepository = AccountRepository(db)
+    val cloudSyncManager = CloudSyncManager(db, accountRepository)
+
+    val accountState: StateFlow<AccountState> = accountRepository.accountState
+    val isSyncing: StateFlow<Boolean> = cloudSyncManager.isSyncing
 
     // Profiles List
     val profiles: StateFlow<List<Profile>> = db.getAllProfiles()
@@ -103,6 +111,7 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
 
     init {
         viewModelScope.launch {
+            accountRepository.loadAccountState()
             _onboardingShown.value = db.getMetadataValue("onboarding_shown") == "true"
             _disclaimerAccepted.value = db.getMetadataValue("disclaimer_accepted") == "true"
             _donationCount.value = db.getMetadataValue("donation_count")?.toIntOrNull() ?: 0
@@ -117,6 +126,55 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
                 _showSettings.value = true
             }
             updateConfigStatus()
+
+            if (accountRepository.accountState.value.isConnected) {
+                cloudSyncManager.syncNow()
+                val updatedProfiles = db.getAllProfilesSnapshot()
+                if (updatedProfiles.isNotEmpty()) {
+                    val targetId = db.getMetadataValue("active_profile_id") ?: updatedProfiles.first().id
+                    selectProfile(targetId)
+                }
+            }
+        }
+    }
+
+    fun createNewAccount() {
+        viewModelScope.launch {
+            accountRepository.createNewAccount()
+            cloudSyncManager.syncNow()
+        }
+    }
+
+    fun joinAccount(code: String) {
+        viewModelScope.launch {
+            accountRepository.joinAccount(code)
+            cloudSyncManager.syncNow()
+            val currentProfiles = db.getAllProfilesSnapshot()
+            if (currentProfiles.isNotEmpty()) {
+                selectProfile(currentProfiles.first().id)
+            }
+        }
+    }
+
+    fun disconnectAccount() {
+        viewModelScope.launch {
+            accountRepository.disconnectAccount()
+        }
+    }
+
+    fun syncCloudNow() {
+        viewModelScope.launch {
+            cloudSyncManager.syncNow()
+            refreshActiveProfile()
+            updateConfigStatus()
+        }
+    }
+
+    private fun triggerAutoSync() {
+        viewModelScope.launch {
+            if (accountRepository.accountState.value.isConnected) {
+                cloudSyncManager.syncNow()
+            }
         }
     }
 
@@ -362,6 +420,8 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
                     db.insertAllMedications(getDefaultMedicationsList(currentProfile.id))
                 }
             }
+
+            triggerAutoSync()
         }
     }
 
@@ -423,6 +483,7 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
                     _showSettings.value = true
                 }
             }
+            triggerAutoSync()
         }
     }
 
@@ -451,6 +512,7 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
                         profile.descrizioneNotifica
                     )
                 }
+                triggerAutoSync()
             }
         }
     }
@@ -473,6 +535,7 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
                     profile.descrizioneNotifica
                 )
             }
+            triggerAutoSync()
         }
     }
 
@@ -489,6 +552,7 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
             } else {
                 com.aistudio.richfarmaciw.util.PlatformNotificationHelper.cancelNotification(context, medication)
             }
+            triggerAutoSync()
         }
     }
 
@@ -499,6 +563,7 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
             if (_selectedMedicationIds.value.contains(medication.id)) {
                 toggleMedicationSelection(medication)
             }
+            triggerAutoSync()
         }
     }
 
@@ -579,6 +644,7 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
 
             db.insertSentRequest(req)
             clearFormSelection()
+            triggerAutoSync()
         }
     }
 

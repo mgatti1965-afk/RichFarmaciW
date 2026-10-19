@@ -61,6 +61,10 @@ kotlin {
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(libs.kotlinx.serialization.json)
 
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
+
                 implementation(libs.androidx.room.common)
             }
         }
@@ -71,6 +75,7 @@ kotlin {
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.sqlite.bundled)
                 implementation(libs.sqlite)
+                implementation(libs.ktor.client.cio)
             }
         }
 
@@ -103,6 +108,7 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 implementation(libs.kotlinx.serialization.json)
+                implementation(libs.ktor.client.js)
             }
         }
 

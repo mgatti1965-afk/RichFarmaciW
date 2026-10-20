@@ -21,8 +21,18 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.aistudio.richfarmaciw"
+            packageName = "RichFarmaci"
             packageVersion = "1.0.0"
+            description = "RichFarmaci - Gestione Farmaci e Prescrizioni"
+            copyright = "© 2025 RichFarmaci"
+            vendor = "RichFarmaci"
+
+            windows {
+                menu = true
+                shortcut = true
+                dirChooser = true
+                menuGroup = "RichFarmaci"
+            }
         }
     }
 }

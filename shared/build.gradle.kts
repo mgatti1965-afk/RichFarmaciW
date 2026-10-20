@@ -65,16 +65,16 @@ kotlin {
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
 
-                implementation(libs.androidx.room.common)
+                api(libs.androidx.room.common)
             }
         }
 
         val roomTargetsMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation(libs.androidx.room.runtime)
-                implementation(libs.sqlite.bundled)
-                implementation(libs.sqlite)
+                api(libs.androidx.room.runtime)
+                api(libs.sqlite.bundled)
+                api(libs.sqlite)
                 implementation(libs.ktor.client.cio)
             }
         }

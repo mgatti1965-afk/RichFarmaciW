@@ -12,6 +12,10 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(libs.kotlinx.coroutinesSwing)
 
+    implementation(libs.androidx.room.runtime)
+    implementation("androidx.sqlite:sqlite-jvm:2.5.0-alpha13")
+    implementation("androidx.sqlite:sqlite-bundled-jvm:2.5.0-alpha13")
+
     implementation(libs.compose.uiToolingPreview)
 }
 
@@ -32,6 +36,7 @@ compose.desktop {
                 shortcut = true
                 dirChooser = true
                 menuGroup = "RichFarmaci"
+                iconFile.set(project.file("icon.ico"))
             }
         }
     }

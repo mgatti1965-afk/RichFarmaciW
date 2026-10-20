@@ -63,14 +63,8 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
 fun getRoomDatabase(
     builder: RoomDatabase.Builder<AppDatabase>
 ): AppDatabase {
-    return try {
-        builder
-            .setDriver(BundledSQLiteDriver())
-            .setQueryCoroutineContext(Dispatchers.IO)
-            .build()
-    } catch (_: Throwable) {
-        builder
-            .setQueryCoroutineContext(Dispatchers.IO)
-            .build()
-    }
+    return builder
+        .setDriver(BundledSQLiteDriver())
+        .setQueryCoroutineContext(Dispatchers.IO)
+        .build()
 }

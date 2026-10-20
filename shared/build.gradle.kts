@@ -119,6 +119,21 @@ kotlin {
         val jsMain by getting {
             dependsOn(webMain)
         }
+
+        val webTest by creating {
+            dependsOn(commonTest)
+            dependencies {
+                implementation(libs.ktor.client.js)
+            }
+        }
+
+        val wasmJsTest by getting {
+            dependsOn(webTest)
+        }
+
+        val jsTest by getting {
+            dependsOn(webTest)
+        }
     }
 }
 

@@ -101,7 +101,7 @@ class FakeRichFarmaciDatabase : RichFarmaciDatabase {
     override suspend fun getAllMedicationsSnapshot(): List<Medication> = medications.values.toList()
     override suspend fun getMedicationById(id: String): Medication? = medications[id]
     override suspend fun insertMedication(medication: Medication) { medications[medication.id] = medication }
-    override suspend fun insertAllMedications(list: List<Medication>) { list.forEach { medications[it.id] = it } }
+    override suspend fun insertAllMedications(medications: List<Medication>) { medications.forEach { this.medications[it.id] = it } }
     override suspend fun updateMedication(medication: Medication) { medications[medication.id] = medication }
     override suspend fun deleteMedication(medication: Medication) { medications.remove(medication.id) }
     override suspend fun deleteMedicationById(id: String) { medications.remove(id) }

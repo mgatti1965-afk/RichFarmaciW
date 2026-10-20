@@ -72,7 +72,7 @@ class AccountRepository(private val db: RichFarmaciDatabase) {
         loadAccountState()
     }
 
-    suspend fun setError(message: String) {
+    fun setError(message: String) {
         _accountState.value = _accountState.value.copy(syncErrorMessage = message)
     }
 

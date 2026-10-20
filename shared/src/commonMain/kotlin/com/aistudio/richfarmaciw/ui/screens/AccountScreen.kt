@@ -18,15 +18,12 @@ import androidx.compose.ui.unit.sp
 import com.aistudio.richfarmaciw.data.model.AccountState
 import com.aistudio.richfarmaciw.ui.theme.GreenAccent
 import com.aistudio.richfarmaciw.ui.theme.GreenPrimary
-import com.aistudio.richfarmaciw.ui.theme.Slate900
 
 @Composable
 fun AccountSection(
     accountState: AccountState,
     isSyncing: Boolean,
-    onCreateAccount: () -> Unit,
     onJoinAccount: (String) -> Unit,
-    onDisconnectAccount: () -> Unit,
     onSyncNow: () -> Unit
 ) {
     val clipboardManager = LocalClipboardManager.current

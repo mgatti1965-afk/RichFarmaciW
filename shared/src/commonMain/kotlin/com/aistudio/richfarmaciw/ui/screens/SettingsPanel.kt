@@ -255,9 +255,7 @@ fun SettingsPanelContent(
                 AccountSection(
                     accountState = accountState,
                     isSyncing = isSyncing,
-                    onCreateAccount = { viewModel.createNewAccount() },
                     onJoinAccount = { viewModel.joinAccount(it) },
-                    onDisconnectAccount = { viewModel.disconnectAccount() },
                     onSyncNow = { viewModel.syncCloudNow() }
                 )
                 HorizontalDivider(color = GrayBorder, modifier = Modifier.padding(top = 8.dp))

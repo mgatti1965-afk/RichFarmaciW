@@ -5,7 +5,6 @@ import com.aistudio.richfarmaciw.data.model.BackupData
 import com.aistudio.richfarmaciw.data.model.CloudAccountPayload
 import com.aistudio.richfarmaciw.data.repository.AccountRepository
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.put
@@ -18,7 +17,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.time.TimeSource
 

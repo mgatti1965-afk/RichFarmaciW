@@ -31,6 +31,7 @@ fun AccountSection(
 ) {
     val clipboardManager = LocalClipboardManager.current
     var showJoinDialog by remember { mutableStateOf(false) }
+    var showAdvancedOptions by remember { mutableStateOf(false) }
     var inputCode by remember { mutableStateOf("") }
     var copiedMessage by remember { mutableStateOf(false) }
 
@@ -61,7 +62,7 @@ fun AccountSection(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Accedi agli stessi farmaci da Cellulare e PC",
+                        text = "I tuoi dati sono sincronizzati tra Smartphone e PC",
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -70,143 +71,147 @@ fun AccountSection(
 
             HorizontalDivider()
 
-            if (accountState.isConnected && accountState.familyCode.isNotBlank()) {
-                // Stato: Connesso con un Codice Famiglia
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = GreenPrimary.copy(alpha = 0.12f)),
-                    shape = RoundedCornerShape(12.dp)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = GreenPrimary.copy(alpha = 0.12f)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = GreenPrimary,
+                            modifier = Modifier.size(24.dp)
+                        )
                         Text(
-                            text = "IL TUO CODICE ACCOUNT FAMIGLIA",
-                            fontSize = 13.sp,
+                            text = "SINCRONIZZAZIONE AUTOMATICA ATTIVA",
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = GreenPrimary
                         )
-
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.surface,
-                            shadowElevation = 2.dp
-                        ) {
-                            Text(
-                                text = accountState.familyCode,
-                                fontSize = 26.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-
-                        Text(
-                            text = "Usa questo codice sugli altri tuoi dispositivi per sincronizzare i dati automaticamente.",
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Button(
-                                onClick = {
-                                    clipboardManager.setText(AnnotatedString(accountState.familyCode))
-                                    copiedMessage = true
-                                },
-                                modifier = Modifier.weight(1f).height(48.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = Slate900)
-                            ) {
-                                Icon(Icons.Default.ContentCopy, contentDescription = null)
-                                Spacer(Modifier.width(6.dp))
-                                Text("Copia Codice", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                            }
-
-                            Button(
-                                onClick = onSyncNow,
-                                enabled = !isSyncing,
-                                modifier = Modifier.weight(1f).height(48.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
-                            ) {
-                                if (isSyncing) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
-                                        color = Color.White,
-                                        strokeWidth = 2.dp
-                                    )
-                                } else {
-                                    Icon(Icons.Default.Sync, contentDescription = null)
-                                    Spacer(Modifier.width(6.dp))
-                                    Text("Sincronizza", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                        }
-
-                        if (copiedMessage) {
-                            Text(
-                                text = "✓ Codice copiato negli appunti!",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = GreenAccent
-                            )
-                        }
                     }
-                }
 
-                if (accountState.syncErrorMessage.isNotBlank()) {
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        shadowElevation = 2.dp
+                    ) {
+                        Text(
+                            text = "Account: ${accountState.familyCode.ifBlank { "RichFarmaci" }}",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
                     Text(
-                        text = accountState.syncErrorMessage,
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.error,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                TextButton(
-                    onClick = onDisconnectAccount,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                ) {
-                    Icon(Icons.Default.LinkOff, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                    Spacer(Modifier.width(6.dp))
-                    Text("Scollega questo dispositivo dall'Account", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
-                }
-
-            } else {
-                // Stato: Non ancora collegato
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Per accedere ai tuoi farmaci e richieste sia da smartphone che da PC, collega i dispositivi con un Codice Account.",
-                        fontSize = 15.sp,
+                        text = "Tutti i farmaci inseriti su questo dispositivo compaiono automaticamente anche sugli altri tuoi dispositivi.",
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    Button(
-                        onClick = onCreateAccount,
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                        shape = RoundedCornerShape(12.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(Icons.Default.AddCircle, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Crea Nuovo Codice Account", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Button(
+                            onClick = onSyncNow,
+                            enabled = !isSyncing,
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            if (isSyncing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(22.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text("Sincronizzazione in corso...", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            } else {
+                                Icon(Icons.Default.Sync, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Aggiorna / Sincronizza Ora", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+
+                    if (copiedMessage) {
+                        Text(
+                            text = "✓ Codice copiato negli appunti!",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = GreenAccent
+                        )
+                    }
+                }
+            }
+
+            if (accountState.syncErrorMessage.isNotBlank()) {
+                Text(
+                    text = accountState.syncErrorMessage,
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.error,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            // Opzioni avanzate (per i familiari)
+            TextButton(
+                onClick = { showAdvancedOptions = !showAdvancedOptions },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Icon(
+                    if (showAdvancedOptions) Icons.Default.ExpandLess else Icons.Default.Tune,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    if (showAdvancedOptions) "Nascondi Opzioni Avanzate" else "Opzioni Avanzate Codice Account (Per Familiari)",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            if (showAdvancedOptions) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            clipboardManager.setText(AnnotatedString(accountState.familyCode.ifBlank { "RichFarmaci" }))
+                            copiedMessage = true
+                        },
+                        modifier = Modifier.fillMaxWidth().height(44.dp)
+                    ) {
+                        Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Copia Codice Account", fontSize = 14.sp)
                     }
 
                     OutlinedButton(
                         onClick = { showJoinDialog = true },
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.fillMaxWidth().height(44.dp)
                     ) {
-                        Icon(Icons.Default.Key, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Ho già un Codice (Collega)", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Icon(Icons.Default.Key, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Collega ad un altro Codice Personalizzato", fontSize = 14.sp)
                     }
                 }
             }
@@ -217,14 +222,14 @@ fun AccountSection(
         AlertDialog(
             onDismissRequest = { showJoinDialog = false },
             icon = { Icon(Icons.Default.Key, contentDescription = null, tint = GreenPrimary, modifier = Modifier.size(36.dp)) },
-            title = { Text("Inserisci il Codice Account", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center) },
+            title = { Text("Personalizza Codice Account", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Digita il codice presente sull'altro tuo dispositivo:")
+                    Text("Digita il codice personalizzato che desideri utilizzare:")
                     OutlinedTextField(
                         value = inputCode,
-                        onValueChange = { inputCode = it.uppercase() },
-                        label = { Text("Codice Account Famiglia") },
+                        onValueChange = { inputCode = it },
+                        label = { Text("Codice Account (Default: RichFarmaci)") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -233,15 +238,13 @@ fun AccountSection(
             confirmButton = {
                 Button(
                     onClick = {
-                        if (inputCode.isNotBlank()) {
-                            onJoinAccount(inputCode)
-                            showJoinDialog = false
-                            inputCode = ""
-                        }
+                        onJoinAccount(inputCode.ifBlank { "RichFarmaci" })
+                        showJoinDialog = false
+                        inputCode = ""
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
                 ) {
-                    Text("Collega Dispositivo", fontWeight = FontWeight.Bold)
+                    Text("Salva Codice", fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {

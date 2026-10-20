@@ -223,13 +223,23 @@ fun SettingsPanelContent(
         }
         HorizontalDivider(color = GrayBorder)
 
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-            LazyColumn(
-                modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(vertical = 16.dp)
+        HorizontalDivider(color = GrayBorder)
+
+        val scrollState = rememberScrollState()
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Column(
+                modifier = Modifier
+                    .widthIn(max = 600.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-            item {
                 ProfileContextSwitcher(
                     profiles = profiles,
                     activeProfile = activeProfile,
@@ -238,9 +248,7 @@ fun SettingsPanelContent(
                     onDeleteProfile = { viewModel.deleteProfile(it) }
                 )
                 HorizontalDivider(color = GrayBorder, modifier = Modifier.padding(top = 8.dp))
-            }
 
-            item {
                 val accountState by viewModel.accountState.collectAsState()
                 val isSyncing by viewModel.isSyncing.collectAsState()
 
@@ -253,9 +261,7 @@ fun SettingsPanelContent(
                     onSyncNow = { viewModel.syncCloudNow() }
                 )
                 HorizontalDivider(color = GrayBorder, modifier = Modifier.padding(top = 8.dp))
-            }
 
-            item {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -412,14 +418,11 @@ fun SettingsPanelContent(
                         )
                     }
                 }
-            }
 
-            if (!isNewProfile) {
-                item {
+                if (!isNewProfile) {
                     HorizontalDivider(color = GrayBorder)
                     Text(text = "3. Gestore Rubrica Farmaci", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Slate900, modifier = Modifier.padding(top = 10.dp))
-                }
-                item {
+
                     Button(
                         onClick = {
                             medicationToEdit = null
@@ -433,29 +436,32 @@ fun SettingsPanelContent(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("NUOVO FARMACO", fontWeight = FontWeight.Bold, color = White)
                     }
-                }
-                item { Text("I Tuoi Farmaci Salvati:", fontWeight = FontWeight.Bold, color = Slate900, modifier = Modifier.padding(top = 8.dp)) }
-                if (medications.isEmpty()) {
-                    item { Text("La rubrica è vuota.", color = Slate600, modifier = Modifier.padding(16.dp)) }
-                } else {
-                    items(medications, key = { it.id }) { med ->
-                        ConfigurationMedicationRow(
-                            med = med,
-                            notificationsEnabled = settings.notificheAttive,
-                            onEdit = {
-                                medicationToEdit = med
-                                showMedicationDialog = true
-                            },
-                            onToggleStandby = { viewModel.toggleMedicationStandby(null, med) },
-                            onDelete = { viewModel.deleteMedication(null, med) }
-                        )
+
+                    Text("I Tuoi Farmaci Salvati:", fontWeight = FontWeight.Bold, color = Slate900, modifier = Modifier.padding(top = 8.dp))
+
+                    if (medications.isEmpty()) {
+                        Text("La rubrica è vuota.", color = Slate600, modifier = Modifier.padding(16.dp))
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            medications.forEach { med ->
+                                ConfigurationMedicationRow(
+                                    med = med,
+                                    notificationsEnabled = settings.notificheAttive,
+                                    onEdit = {
+                                        medicationToEdit = med
+                                        showMedicationDialog = true
+                                    },
+                                    onToggleStandby = { viewModel.toggleMedicationStandby(null, med) },
+                                    onDelete = { viewModel.deleteMedication(null, med) }
+                                )
+                            }
+                        }
                     }
                 }
-            }
 
-            item { Spacer(modifier = Modifier.height(32.dp)) }
+                Spacer(modifier = Modifier.height(32.dp))
+            }
         }
-    }
 }
 
     if (showAddProfileDialog) {

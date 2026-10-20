@@ -12,14 +12,21 @@ class AccountRepository(private val db: RichFarmaciDatabase) {
     val accountState: StateFlow<AccountState> = _accountState.asStateFlow()
 
     suspend fun loadAccountState(): AccountState {
-        val code = db.getMetadataValue(KEY_FAMILY_CODE) ?: ""
-        val isConn = db.getMetadataValue(KEY_IS_CONNECTED) == "true"
+        var code = db.getMetadataValue(KEY_FAMILY_CODE)
+        if (code.isNullOrBlank()) {
+            code = DEFAULT_FAMILY_CODE
+            db.setMetadataValue(KEY_FAMILY_CODE, DEFAULT_FAMILY_CODE)
+            db.setMetadataValue(KEY_IS_CONNECTED, "true")
+        }
+
+        val isConnStr = db.getMetadataValue(KEY_IS_CONNECTED)
+        val isConn = isConnStr == null || isConnStr == "true"
         val lastSync = db.getMetadataValue(KEY_LAST_SYNC_TS)?.toLongOrNull() ?: 0L
         val name = db.getMetadataValue(KEY_ACCOUNT_NAME) ?: ""
 
         val newState = AccountState(
             familyCode = code,
-            isConnected = isConn && code.isNotBlank(),
+            isConnected = isConn,
             lastSyncTimestamp = lastSync,
             accountName = name
         )
@@ -37,12 +44,19 @@ class AccountRepository(private val db: RichFarmaciDatabase) {
     }
 
     suspend fun joinAccount(familyCode: String, accountName: String = "") {
-        val cleanCode = familyCode.trim().uppercase()
+        val cleanCode = if (familyCode.isBlank()) DEFAULT_FAMILY_CODE else familyCode.trim()
         db.setMetadataValue(KEY_FAMILY_CODE, cleanCode)
         db.setMetadataValue(KEY_IS_CONNECTED, "true")
         if (accountName.isNotBlank()) {
             db.setMetadataValue(KEY_ACCOUNT_NAME, accountName)
         }
+        loadAccountState()
+    }
+
+    suspend fun resetToDefaultAccount() {
+        db.setMetadataValue(KEY_FAMILY_CODE, DEFAULT_FAMILY_CODE)
+        db.setMetadataValue(KEY_IS_CONNECTED, "true")
+        db.deleteMetadataKey(KEY_LAST_SYNC_TS)
         loadAccountState()
     }
 
@@ -63,13 +77,14 @@ class AccountRepository(private val db: RichFarmaciDatabase) {
     }
 
     private fun generateFamilyCode(): String {
-        val chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" // Exclude 0/O/1/I for elderly readability
+        val chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         val part1 = (1..3).map { chars.random() }.joinToString("")
         val part2 = (1..3).map { chars.random() }.joinToString("")
         return "FARM-$part1-$part2"
     }
 
     companion object {
+        const val DEFAULT_FAMILY_CODE = "RichFarmaci"
         private const val KEY_FAMILY_CODE = "account_family_code"
         private const val KEY_IS_CONNECTED = "account_is_connected"
         private const val KEY_LAST_SYNC_TS = "account_last_sync_ts"

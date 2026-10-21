@@ -250,17 +250,6 @@ fun SettingsPanelContent(
                 )
                 HorizontalDivider(color = GrayBorder, modifier = Modifier.padding(top = 8.dp))
 
-                val accountState by viewModel.accountState.collectAsState()
-                val isSyncing by viewModel.isSyncing.collectAsState()
-
-                AccountSection(
-                    accountState = accountState,
-                    isSyncing = isSyncing,
-                    onJoinAccount = { viewModel.joinAccount(it) },
-                    onSyncNow = { viewModel.syncCloudNow() }
-                )
-                HorizontalDivider(color = GrayBorder, modifier = Modifier.padding(top = 8.dp))
-
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)

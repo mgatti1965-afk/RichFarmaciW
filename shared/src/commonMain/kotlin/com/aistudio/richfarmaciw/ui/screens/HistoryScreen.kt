@@ -24,6 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aistudio.richfarmaciw.data.model.SentRequest
 import com.aistudio.richfarmaciw.ui.theme.*
+import androidx.compose.foundation.Image
+import org.jetbrains.compose.resources.painterResource
+import richfarmaciw.shared.generated.resources.*
 import com.aistudio.richfarmaciw.ui.viewmodel.MainViewModel
 import org.jetbrains.compose.resources.painterResource
 import richfarmaciw.shared.generated.resources.*
@@ -73,9 +76,9 @@ fun HistoryScreen(viewModel: MainViewModel, manualText: String) {
                             modifier = Modifier.size(36.dp).background(HelpIconBg, CircleShape)
                         ) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Help,
+                                painter = painterResource(Res.drawable.ic_help),
                                 contentDescription = "Aiuto",
-                                tint = HelpIconTint,
+                                tint = Color.Unspecified,
                                 modifier = Modifier.size(20.dp)
                             )
                         }

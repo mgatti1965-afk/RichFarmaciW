@@ -93,6 +93,7 @@ kotlin {
         val androidMain by getting {
             dependsOn(roomTargetsMain)
             dependencies {
+                implementation(libs.androidx.activity.compose)
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.compose.uiTooling)
             }

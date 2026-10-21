@@ -171,11 +171,7 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
     }
 
     private fun triggerAutoSync() {
-        viewModelScope.launch {
-            if (accountRepository.accountState.value.isConnected) {
-                cloudSyncManager.syncNow()
-            }
-        }
+        // Sincronizzazione cloud disattivata temporaneamente
     }
 
     fun setOnboardingShown(shown: Boolean) {

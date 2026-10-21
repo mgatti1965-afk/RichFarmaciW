@@ -1,6 +1,7 @@
 package com.aistudio.richfarmaciw.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aistudio.richfarmaciw.data.model.Medication
 import com.aistudio.richfarmaciw.ui.theme.*
+import org.jetbrains.compose.resources.painterResource
+import richfarmaciw.shared.generated.resources.*
 import com.aistudio.richfarmaciw.ui.viewmodel.MainViewModel
 import org.jetbrains.compose.resources.painterResource
 import richfarmaciw.shared.generated.resources.*
@@ -148,9 +151,9 @@ fun RequestScreen(
                                 modifier = Modifier.size(36.dp).background(CoffeeIconBg, CircleShape)
                             ) {
                                 Icon(
-                                    Icons.Default.Coffee,
+                                    painter = painterResource(Res.drawable.ic_coffee),
                                     contentDescription = "Dona",
-                                    tint = if (donationCount > 0) GreenPrimary else CoffeeIconTint,
+                                    tint = Color.Unspecified,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -159,9 +162,9 @@ fun RequestScreen(
                                 modifier = Modifier.size(36.dp).background(HelpIconBg, CircleShape)
                             ) {
                                 Icon(
-                                    Icons.AutoMirrored.Filled.Help,
+                                    painter = painterResource(Res.drawable.ic_help),
                                     contentDescription = "Aiuto",
-                                    tint = HelpIconTint,
+                                    tint = Color.Unspecified,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -170,9 +173,9 @@ fun RequestScreen(
                                 modifier = Modifier.size(36.dp).background(GrayBackground, CircleShape)
                             ) {
                                 Icon(
-                                    Icons.Default.Settings,
+                                    painter = painterResource(Res.drawable.ic_settings),
                                     contentDescription = "Impostazioni",
-                                    tint = Slate900,
+                                    tint = Color.Unspecified,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }

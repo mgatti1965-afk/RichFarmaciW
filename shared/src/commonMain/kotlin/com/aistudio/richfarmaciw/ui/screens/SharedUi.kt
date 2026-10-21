@@ -1,6 +1,7 @@
 package com.aistudio.richfarmaciw.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -148,17 +149,12 @@ fun HelpDialog(type: String, manualText: String, onDismiss: () -> Unit) {
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier.size(32.dp).background(HelpIconBg, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Help,
-                        contentDescription = null,
-                        tint = HelpIconTint,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                Icon(
+                    painter = painterResource(Res.drawable.ic_help),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(28.dp)
+                )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(text = when(type) { "richiesta" -> "Guida Richiesta"; "cronologia" -> "Guida Cronologia"; else -> "Guida Configurazione" }, fontWeight = FontWeight.Bold, color = Slate900)
             }
@@ -174,17 +170,12 @@ fun HelpDialog(type: String, manualText: String, onDismiss: () -> Unit) {
                         HelpItem("In caso di necessità puoi utilizzare \"Messaggio veloce al Medico\" per comunicazioni extra.")
                         HelpItemContent {
                             Text("Se desideri sostenere il progetto, clicca sull'icona ", fontSize = 15.sp, color = Slate600)
-                            Box(
-                                modifier = Modifier.size(22.dp).background(CoffeeIconBg, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Coffee,
-                                    contentDescription = "Sostieni",
-                                    tint = CoffeeIconTint,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                            }
+                            Icon(
+                                painter = painterResource(Res.drawable.ic_coffee),
+                                contentDescription = "Sostieni",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(20.dp)
+                            )
                             Text(" in alto a destra.", fontSize = 15.sp, color = Slate600)
                         }
                     }
@@ -322,11 +313,6 @@ fun BackupDialog(
     onDismiss: () -> Unit,
     onImportSuccess: () -> Unit
 ) {
-    val accountState by viewModel.accountState.collectAsState()
-    val isSyncing by viewModel.isSyncing.collectAsState()
-
-    var showJoinDialog by remember { mutableStateOf(false) }
-    var inputCode by remember { mutableStateOf("") }
     var errorMsg by remember { mutableStateOf<String?>(null) }
     var downloadMsg by remember { mutableStateOf<String?>(null) }
     var isProcessing by remember { mutableStateOf(false) }
@@ -335,9 +321,14 @@ fun BackupDialog(
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.CloudUpload, contentDescription = null, tint = GreenPrimary)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Backup e Sincronizzazione", fontWeight = FontWeight.Bold)
+                Icon(
+                    painter = painterResource(Res.drawable.ic_cloud),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text("Backup e Ripristino", fontWeight = FontWeight.Bold)
             }
         },
         text = {
@@ -345,106 +336,11 @@ fun BackupDialog(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Sezione 1: Sincronizzazione Cloud
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = GreenLightBg),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(Icons.Default.CloudSync, contentDescription = null, tint = GreenPrimary)
-                                Column {
-                                    Text("Sincronizzazione Cloud", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Slate900)
-                                    Text("Sincronizza i dati tra dispositivi", fontSize = 12.sp, color = Slate600)
-                                }
-                            }
-                            Button(
-                                onClick = { viewModel.syncCloudNow() },
-                                enabled = !isSyncing,
-                                colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                if (isSyncing) {
-                                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = White, strokeWidth = 2.dp)
-                                } else {
-                                    Icon(Icons.Default.Sync, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(Modifier.width(4.dp))
-                                    Text("Sincronizza", fontSize = 12.sp)
-                                }
-                            }
-                        }
-
-                        if (accountState.syncErrorMessage.isNotBlank()) {
-                            Text(
-                                text = accountState.syncErrorMessage,
-                                fontSize = 12.sp,
-                                color = Color.Red,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-
-                        TextButton(
-                            onClick = { showJoinDialog = !showJoinDialog },
-                            contentPadding = PaddingValues(0.dp)
-                        ) {
-                            Icon(Icons.Default.Key, contentDescription = null, modifier = Modifier.size(14.dp), tint = GreenPrimary)
-                            Spacer(Modifier.width(4.dp))
-                            Text(
-                                text = if (showJoinDialog) "Nascondi Codice Account" else "Codice Account: ${accountState.familyCode.ifBlank { "RichFarmaci" }} (Modifica)",
-                                fontSize = 12.sp,
-                                color = GreenPrimary,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-
-                        if (showJoinDialog) {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedTextField(
-                                    value = inputCode,
-                                    onValueChange = { inputCode = it },
-                                    label = { Text("Nuovo Codice Account", fontSize = 12.sp) },
-                                    singleLine = true,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = GreenPrimary,
-                                        unfocusedBorderColor = GrayBorder
-                                    )
-                                )
-                                Button(
-                                    onClick = {
-                                        viewModel.joinAccount(inputCode.ifBlank { "RichFarmaci" })
-                                        showJoinDialog = false
-                                        inputCode = ""
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                                    shape = RoundedCornerShape(8.dp),
-                                    modifier = Modifier.align(Alignment.End)
-                                ) {
-                                    Text("Salva Codice", fontSize = 12.sp)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(color = GrayBorder.copy(alpha = 0.5f))
-
-                // Sezione 2: Backup Manuale (File)
-                Text("Backup Manuale (File)", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Slate900)
+                Text(
+                    "Usa questa funzione per scaricare un file con tutti i dati o per ripristinarli dalla cartella Download.",
+                    fontSize = 14.sp,
+                    color = Slate600
+                )
 
                 Button(
                     onClick = {
@@ -714,8 +610,15 @@ fun DonationDialog(
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_coffee),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = if (isBlocked) "Grazie di cuore! ☕" else "Offri un caffè ☕",
+                    text = if (isBlocked) "Grazie di cuore!" else "Offri un caffè",
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     color = Slate900

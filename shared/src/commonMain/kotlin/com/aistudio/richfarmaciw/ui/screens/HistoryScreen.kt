@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
@@ -67,8 +68,16 @@ fun HistoryScreen(viewModel: MainViewModel, manualText: String) {
                                 color = Slate900
                             )
                         }
-                        IconButton(onClick = { showHelp = true }) {
-                            Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
+                        IconButton(
+                            onClick = { showHelp = true },
+                            modifier = Modifier.size(36.dp).background(HelpIconBg, CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Help,
+                                contentDescription = "Aiuto",
+                                tint = HelpIconTint,
+                                modifier = Modifier.size(20.dp)
+                            )
                         }
                     }
 

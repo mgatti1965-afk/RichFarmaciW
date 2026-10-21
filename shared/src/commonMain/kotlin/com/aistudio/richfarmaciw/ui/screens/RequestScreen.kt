@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
@@ -141,15 +142,39 @@ fun RequestScreen(
                                 color = GreenPrimary
                             )
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            IconButton(onClick = { showDonation = true }) {
-                                Icon(Icons.Default.Coffee, contentDescription = "Dona", tint = if(donationCount > 0) GreenPrimary else Slate600)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(
+                                onClick = { showDonation = true },
+                                modifier = Modifier.size(36.dp).background(CoffeeIconBg, CircleShape)
+                            ) {
+                                Icon(
+                                    Icons.Default.Coffee,
+                                    contentDescription = "Dona",
+                                    tint = if (donationCount > 0) GreenPrimary else CoffeeIconTint,
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
-                            IconButton(onClick = { showHelp = true }) {
-                                Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
+                            IconButton(
+                                onClick = { showHelp = true },
+                                modifier = Modifier.size(36.dp).background(HelpIconBg, CircleShape)
+                            ) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.Help,
+                                    contentDescription = "Aiuto",
+                                    tint = HelpIconTint,
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
-                            IconButton(onClick = { viewModel.setShowSettings(true) }) {
-                                Icon(Icons.Default.Settings, contentDescription = "Impostazioni", tint = Slate900)
+                            IconButton(
+                                onClick = { viewModel.setShowSettings(true) },
+                                modifier = Modifier.size(36.dp).background(GrayBackground, CircleShape)
+                            ) {
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = "Impostazioni",
+                                    tint = Slate900,
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
                         }
                     }

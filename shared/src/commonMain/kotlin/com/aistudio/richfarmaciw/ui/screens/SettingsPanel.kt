@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -196,12 +197,12 @@ fun SettingsPanelContent(
                             }
                         }
                         Spacer(modifier = Modifier.width(4.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            IconButton(onClick = { showBackupDialog = true }, modifier = Modifier.background(GrayBackground, CircleShape)) {
-                                Icon(Icons.Default.CloudUpload, contentDescription = "Backup", tint = Slate900)
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = { showBackupDialog = true }, modifier = Modifier.size(36.dp).background(GrayBackground, CircleShape)) {
+                                Icon(Icons.Default.CloudUpload, contentDescription = "Backup", tint = Slate900, modifier = Modifier.size(20.dp))
                             }
-                            IconButton(onClick = { showHelp = true }, modifier = Modifier.background(GrayBackground, CircleShape)) {
-                                Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Aiuto", tint = Slate900)
+                            IconButton(onClick = { showHelp = true }, modifier = Modifier.size(36.dp).background(HelpIconBg, CircleShape)) {
+                                Icon(Icons.AutoMirrored.Filled.Help, contentDescription = "Aiuto", tint = HelpIconTint, modifier = Modifier.size(20.dp))
                             }
                             IconButton(
                                 onClick = {
@@ -685,7 +686,12 @@ fun MedicationEditorDialog(
             onDismissRequest = { showHelpDialog = false },
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = null, tint = GreenPrimary)
+                    Box(
+                        modifier = Modifier.size(28.dp).background(HelpIconBg, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.Help, contentDescription = null, tint = HelpIconTint, modifier = Modifier.size(18.dp))
+                    }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Guida Farmaco e Notifiche", fontWeight = FontWeight.Bold)
                 }
@@ -725,12 +731,12 @@ fun MedicationEditorDialog(
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     IconButton(
                         onClick = { showHelpDialog = true },
-                        modifier = Modifier.size(32.dp).background(GreenPrimary.copy(alpha = 0.1f), CircleShape)
+                        modifier = Modifier.size(32.dp).background(HelpIconBg, CircleShape)
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.HelpOutline,
+                            imageVector = Icons.AutoMirrored.Filled.Help,
                             contentDescription = "Aiuto",
-                            tint = GreenPrimary,
+                            tint = HelpIconTint,
                             modifier = Modifier.size(18.dp)
                         )
                     }

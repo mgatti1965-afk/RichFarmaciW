@@ -4,9 +4,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -18,6 +20,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aistudio.richfarmaciw.data.model.Profile
@@ -132,6 +135,7 @@ fun PharmacyCross(modifier: Modifier = Modifier, color: Color = GreenPrimary) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HelpDialog(type: String, manualText: String, onDismiss: () -> Unit) {
     var showFullManual by remember { mutableStateOf(false) }
@@ -144,8 +148,18 @@ fun HelpDialog(type: String, manualText: String, onDismiss: () -> Unit) {
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = null, tint = GreenPrimary)
-                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier.size(32.dp).background(HelpIconBg, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Help,
+                        contentDescription = null,
+                        tint = HelpIconTint,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(text = when(type) { "richiesta" -> "Guida Richiesta"; "cronologia" -> "Guida Cronologia"; else -> "Guida Configurazione" }, fontWeight = FontWeight.Bold, color = Slate900)
             }
         },
@@ -158,6 +172,21 @@ fun HelpDialog(type: String, manualText: String, onDismiss: () -> Unit) {
                         HelpItem("Premi 'Invia richiesta al Medico' per visualizzare l'anteprima del testo.")
                         HelpItem("Nella schermata di anteprima puoi confermare l'invio definitivo via WhatsApp, SMS o Email.")
                         HelpItem("In caso di necessità puoi utilizzare \"Messaggio veloce al Medico\" per comunicazioni extra.")
+                        HelpItemContent {
+                            Text("Se desideri sostenere il progetto, clicca sull'icona ", fontSize = 15.sp, color = Slate600)
+                            Box(
+                                modifier = Modifier.size(22.dp).background(CoffeeIconBg, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Coffee,
+                                    contentDescription = "Sostieni",
+                                    tint = CoffeeIconTint,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                            }
+                            Text(" in alto a destra.", fontSize = 15.sp, color = Slate600)
+                        }
                     }
                     "cronologia" -> {
                         HelpItem("Scegli il paziente tramite la barra azzurra in alto (se ne gestisci più di uno).")
@@ -548,6 +577,24 @@ fun HelpItem(text: String, fontSize: androidx.compose.ui.unit.TextUnit = 15.sp) 
     Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
         Text("• ", fontWeight = FontWeight.Bold, color = GreenPrimary, fontSize = (fontSize.value + 3).sp)
         Text(text = text, fontSize = fontSize, color = Slate600)
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun HelpItemContent(
+    fontSize: TextUnit = 15.sp,
+    content: @Composable FlowRowScope.() -> Unit
+) {
+    Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
+        Text("• ", fontWeight = FontWeight.Bold, color = GreenPrimary, fontSize = (fontSize.value + 3).sp)
+        FlowRow(
+            verticalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.weight(1f)
+        ) {
+            content()
+        }
     }
 }
 

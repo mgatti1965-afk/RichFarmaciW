@@ -9,6 +9,10 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+compose.resources {
+    publicResClass = true
+}
+
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
@@ -56,7 +60,7 @@ kotlin {
                 implementation(libs.compose.material3)
                 implementation(libs.compose.materialIconsExtended)
                 implementation(libs.compose.ui)
-                implementation(libs.compose.components.resources)
+                api(libs.compose.components.resources)
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(libs.kotlinx.serialization.json)

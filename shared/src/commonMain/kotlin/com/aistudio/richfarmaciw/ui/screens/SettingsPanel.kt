@@ -209,24 +209,24 @@ fun SettingsPanelContent(
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                             IconButton(
                                 onClick = { showBackupDialog = true },
-                                modifier = Modifier.size(36.dp).background(GreenLightBg, CircleShape)
+                                modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
-                                    painter = painterResource(Res.drawable.ic_cloud),
+                                    imageVector = Icons.Default.CloudUpload,
                                     contentDescription = "Backup",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(20.dp)
+                                    tint = Slate600,
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                             IconButton(
                                 onClick = { showHelp = true },
-                                modifier = Modifier.size(36.dp).background(HelpIconBg, CircleShape)
+                                modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
-                                    painter = painterResource(Res.drawable.ic_help),
+                                    imageVector = Icons.AutoMirrored.Filled.HelpOutline,
                                     contentDescription = "Aiuto",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(20.dp)
+                                    tint = Slate600,
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                             IconButton(
@@ -238,17 +238,28 @@ fun SettingsPanelContent(
                                         onClose()
                                     }
                                 },
-                                modifier = Modifier.background(GrayBackground, CircleShape)
+                                modifier = Modifier.size(36.dp)
                             ) {
-                                Icon(Icons.Default.Close, contentDescription = "Chiudi", tint = Slate900)
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Chiudi",
+                                    tint = Slate600,
+                                    modifier = Modifier.size(24.dp)
+                                )
                             }
                         }
                     }
+
+                    ProfileContextSwitcher(
+                        profiles = profiles,
+                        activeProfile = activeProfile,
+                        onProfileSelected = { viewModel.selectProfile(it) },
+                        onAddProfile = { showAddProfileDialog = true },
+                        onDeleteProfile = { viewModel.deleteProfile(it) }
+                    )
                 }
             }
         }
-        HorizontalDivider(color = GrayBorder)
-
         HorizontalDivider(color = GrayBorder)
 
         val scrollState = rememberScrollState()
@@ -266,13 +277,6 @@ fun SettingsPanelContent(
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                ProfileContextSwitcher(
-                    profiles = profiles,
-                    activeProfile = activeProfile,
-                    onProfileSelected = { viewModel.selectProfile(it) },
-                    onAddProfile = { showAddProfileDialog = true },
-                    onDeleteProfile = { viewModel.deleteProfile(it) }
-                )
                 HorizontalDivider(color = GrayBorder, modifier = Modifier.padding(top = 8.dp))
 
                 Column(
@@ -319,43 +323,47 @@ fun SettingsPanelContent(
                         shape = RoundedCornerShape(12.dp)
                     )
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        colors = CardDefaults.cardColors(containerColor = GreenPrimary.copy(alpha = 0.08f)),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, GreenPrimary.copy(alpha = 0.3f))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(14.dp).fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                    val contactsPermission by viewModel.contactsPermission.collectAsState()
+
+                    if (contactsPermission == true && contactPicker.isAvailable) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                            colors = CardDefaults.cardColors(containerColor = GreenPrimary.copy(alpha = 0.08f)),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, GreenPrimary.copy(alpha = 0.3f))
                         ) {
-                            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                                Text(
-                                    text = "Importa Medico da Rubrica",
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Slate900
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = "Seleziona dal telefono il contatto del medico",
-                                    fontSize = 12.sp,
-                                    color = Slate600
-                                )
-                            }
-                            Button(
-                                onClick = { contactPicker.launch() },
-                                colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                                shape = RoundedCornerShape(20.dp),
-                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                            Row(
+                                modifier = Modifier.padding(14.dp).fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = "SCEGLI",
-                                    color = White,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                                    Text(
+                                        text = "Importa Medico da Rubrica",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Slate900
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = "Seleziona il contatto del medico curante",
+                                        fontSize = 12.sp,
+                                        color = Slate600
+                                    )
+                                }
+                                Button(
+                                    onClick = { contactPicker.launch() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
+                                    shape = RoundedCornerShape(20.dp),
+                                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                                ) {
+                                    Text(
+                                        text = "SCEGLI",
+                                        color = White,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
                     }

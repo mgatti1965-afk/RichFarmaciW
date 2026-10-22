@@ -53,6 +53,15 @@ fun MainScreen(viewModel: MainViewModel) {
         )
     }
 
+    val contactsPermission by viewModel.contactsPermission.collectAsState()
+
+    if (disclaimerAccepted && contactsPermission == null) {
+        ContactsPermissionDialog(
+            onGrant = { viewModel.setContactsPermission(true) },
+            onDeny = { viewModel.setContactsPermission(false) }
+        )
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {

@@ -73,13 +73,13 @@ fun HistoryScreen(viewModel: MainViewModel, manualText: String) {
                         }
                         IconButton(
                             onClick = { showHelp = true },
-                            modifier = Modifier.size(36.dp).background(HelpIconBg, CircleShape)
+                            modifier = Modifier.size(36.dp)
                         ) {
                             Icon(
-                                painter = painterResource(Res.drawable.ic_help),
+                                imageVector = Icons.AutoMirrored.Filled.HelpOutline,
                                 contentDescription = "Aiuto",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.size(20.dp)
+                                tint = Slate600,
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }

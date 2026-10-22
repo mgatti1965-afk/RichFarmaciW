@@ -33,6 +33,56 @@ import org.jetbrains.compose.resources.painterResource
 import richfarmaciw.shared.generated.resources.*
 
 @Composable
+fun ContactsPermissionDialog(
+    onGrant: () -> Unit,
+    onDeny: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { },
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Contacts,
+                contentDescription = null,
+                tint = GreenPrimary,
+                modifier = Modifier.size(36.dp)
+            )
+        },
+        title = {
+            Text(
+                text = "Accesso alla Rubrica Contatti",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center
+            )
+        },
+        text = {
+            Text(
+                text = "RichFarmaciW richiede l'autorizzazione per accedere alla Rubrica contatti per permetterti di selezionare i dati del Medico curante. Desideri consentire l'accesso?",
+                fontSize = 14.sp,
+                color = Slate600,
+                textAlign = TextAlign.Center
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onGrant,
+                colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text("CONSENTI", fontWeight = FontWeight.Bold, color = White)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDeny) {
+                Text("NON CONSENTIRE", color = Slate600)
+            }
+        },
+        shape = RoundedCornerShape(16.dp),
+        containerColor = White
+    )
+}
+
+@Composable
 fun DisclaimerDialog(manualText: String, onAccept: () -> Unit, onExitApp: () -> Unit) {
     var showFullManual by remember { mutableStateOf(false) }
 
@@ -170,11 +220,10 @@ fun HelpDialog(type: String, manualText: String, onDismiss: () -> Unit) {
                         HelpItem("In caso di necessità puoi utilizzare \"Messaggio veloce al Medico\" per comunicazioni extra.")
                         HelpItemContent {
                             Text("Se desideri sostenere il progetto, clicca sull'icona ", fontSize = 15.sp, color = Slate600)
-                            Icon(
-                                painter = painterResource(Res.drawable.ic_coffee),
+                            Image(
+                                painter = painterResource(Res.drawable.ic_coffee_real),
                                 contentDescription = "Sostieni",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(22.dp)
                             )
                             Text(" in alto a destra.", fontSize = 15.sp, color = Slate600)
                         }
@@ -610,11 +659,10 @@ fun DonationDialog(
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_coffee),
+                Image(
+                    painter = painterResource(Res.drawable.ic_coffee_real),
                     contentDescription = null,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(32.dp)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(

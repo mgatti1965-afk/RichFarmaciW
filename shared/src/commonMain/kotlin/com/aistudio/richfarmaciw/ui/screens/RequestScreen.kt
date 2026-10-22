@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -145,38 +146,37 @@ fun RequestScreen(
                                 color = GreenPrimary
                             )
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                             IconButton(
                                 onClick = { showDonation = true },
-                                modifier = Modifier.size(36.dp).background(CoffeeIconBg, CircleShape)
+                                modifier = Modifier.size(36.dp)
                             ) {
-                                Icon(
-                                    painter = painterResource(Res.drawable.ic_coffee),
+                                Image(
+                                    painter = painterResource(Res.drawable.ic_coffee_real),
                                     contentDescription = "Dona",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(32.dp)
                                 )
                             }
                             IconButton(
                                 onClick = { showHelp = true },
-                                modifier = Modifier.size(36.dp).background(HelpIconBg, CircleShape)
+                                modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
-                                    painter = painterResource(Res.drawable.ic_help),
+                                    imageVector = Icons.AutoMirrored.Filled.HelpOutline,
                                     contentDescription = "Aiuto",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(20.dp)
+                                    tint = Slate600,
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                             IconButton(
                                 onClick = { viewModel.setShowSettings(true) },
-                                modifier = Modifier.size(36.dp).background(GrayBackground, CircleShape)
+                                modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
-                                    painter = painterResource(Res.drawable.ic_settings),
+                                    imageVector = Icons.Default.Settings,
                                     contentDescription = "Impostazioni",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(20.dp)
+                                    tint = Slate600,
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                         }
@@ -261,22 +261,24 @@ fun RequestScreen(
                     if (selectedIds.isNotEmpty()) {
                         Button(
                             onClick = { showPreviewDialog = true },
-                            modifier = Modifier.fillMaxWidth().height(54.dp),
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                            shape = RoundedCornerShape(14.dp)
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = White)
                             Spacer(modifier = Modifier.width(10.dp))
-                            Text("INVIA RICHIESTA AL MEDICO", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Text("INVIA RICHIESTA AL MEDICO", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = White)
                         }
                     } else {
-                        OutlinedButton(
+                        Button(
                             onClick = { showQuickMsgDialog = true },
                             modifier = Modifier.fillMaxWidth().height(52.dp),
-                            border = BorderStroke(1.5.dp, GreenPrimary),
-                            shape = RoundedCornerShape(14.dp)
+                            colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Messaggio veloce al Medico", color = GreenPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Icon(Icons.AutoMirrored.Filled.Message, contentDescription = null, tint = White)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text("MESSAGGIO VELOCE AL MEDICO", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = White)
                         }
                     }
                 }

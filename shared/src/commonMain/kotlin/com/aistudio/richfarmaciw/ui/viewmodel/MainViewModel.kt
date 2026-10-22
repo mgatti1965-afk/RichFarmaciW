@@ -91,6 +91,9 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
     private val _disclaimerAccepted = MutableStateFlow(false)
     val disclaimerAccepted: StateFlow<Boolean> = _disclaimerAccepted.asStateFlow()
 
+    private val _contactsPermission = MutableStateFlow<Boolean?>(null)
+    val contactsPermission: StateFlow<Boolean?> = _contactsPermission.asStateFlow()
+
     private val _backupStatus = MutableStateFlow<String?>(null)
     val backupStatus: StateFlow<String?> = _backupStatus.asStateFlow()
 
@@ -114,6 +117,12 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
             accountRepository.loadAccountState()
             _onboardingShown.value = db.getMetadataValue("onboarding_shown") == "true"
             _disclaimerAccepted.value = db.getMetadataValue("disclaimer_accepted") == "true"
+            val permVal = db.getMetadataValue("contacts_permission")
+            _contactsPermission.value = when (permVal) {
+                "granted" -> true
+                "denied" -> false
+                else -> null
+            }
             _donationCount.value = db.getMetadataValue("donation_count")?.toIntOrNull() ?: 0
 
             val activeId = db.getMetadataValue("active_profile_id")
@@ -185,6 +194,13 @@ class MainViewModel(private val db: RichFarmaciDatabase) : ViewModel() {
         viewModelScope.launch {
             db.setMetadataValue("disclaimer_accepted", accepted.toString())
             _disclaimerAccepted.value = accepted
+        }
+    }
+
+    fun setContactsPermission(granted: Boolean) {
+        viewModelScope.launch {
+            db.setMetadataValue("contacts_permission", if (granted) "granted" else "denied")
+            _contactsPermission.value = granted
         }
     }
 

@@ -36,19 +36,46 @@
             border: none;
             outline: none;
         }
+        #error-log {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: rgba(220, 38, 38, 0.95);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            overflow: auto;
+            z-index: 99999;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
+    <div id="error-log"></div>
     <canvas id="ComposeTarget"></canvas>
-    <script type="application/javascript" src="webApp.js"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => console.log('[PWA] ServiceWorker registered:', reg))
-                    .catch(err => console.log('[PWA] ServiceWorker failed:', err));
-            });
+        function logError(msg) {
+            console.error(msg);
+            var el = document.getElementById('error-log');
+            if (el) {
+                el.style.display = 'block';
+                el.innerText += '\n' + msg;
+            }
         }
+        window.onerror = function(message, source, lineno, colno, error) {
+            logError('[ERROR] ' + message + ' (' + source + ':' + lineno + ')');
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function(event) {
+            logError('[PROMISE REJECTION] ' + (event.reason ? (event.reason.stack || event.reason) : event));
+        });
     </script>
+    <script type="application/javascript" src="webApp.js"></script>
 </body>
 </html>

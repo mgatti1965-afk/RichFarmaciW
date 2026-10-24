@@ -37,12 +37,12 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Web App
-        run: ./gradlew :webApp:wasmJsBrowserDistribution --no-daemon
+        run: ./gradlew :webApp:jsBrowserDistribution --no-daemon
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'webApp/build/dist/wasmJs/productionExecutable'
+          path: 'webApp/build/dist/js/productionExecutable'
 
       - name: Deploy to GitHub Pages
         id: deployment

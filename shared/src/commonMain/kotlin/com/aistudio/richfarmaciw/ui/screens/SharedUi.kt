@@ -95,10 +95,10 @@ fun DisclaimerDialog(manualText: String, onAccept: () -> Unit, onExitApp: () -> 
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 Icon(
-                    painter = painterResource(Res.drawable.app_icon),
+                    imageVector = Icons.Default.Info,
                     contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                    tint = Color.Unspecified
+                    modifier = Modifier.size(56.dp),
+                    tint = Color.Red.copy(alpha = 0.8f)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(text = "Limitazione di Responsabilità", fontWeight = FontWeight.Bold, color = Color.Red.copy(alpha = 0.8f), textAlign = TextAlign.Center)
@@ -286,10 +286,10 @@ fun OnboardingDialog(manualText: String, onDismiss: () -> Unit) {
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 Icon(
-                    painter = painterResource(Res.drawable.app_icon),
+                    imageVector = Icons.Default.Info,
                     contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                    tint = Color.Unspecified
+                    modifier = Modifier.size(56.dp),
+                    tint = GreenPrimary
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(

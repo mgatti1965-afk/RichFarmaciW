@@ -23,6 +23,7 @@ kotlin {
 
     if (isMac) {
         listOf(
+            iosX64(),
             iosArm64(),
             iosSimulatorArm64()
         ).forEach { iosTarget ->
@@ -146,6 +147,7 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspJvm", libs.androidx.room.compiler)
     if (System.getProperty("os.name").contains("Mac", ignoreCase = true)) {
+        add("kspIosX64", libs.androidx.room.compiler)
         add("kspIosArm64", libs.androidx.room.compiler)
         add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     }

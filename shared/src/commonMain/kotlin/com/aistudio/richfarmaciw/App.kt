@@ -1,6 +1,10 @@
 package com.aistudio.richfarmaciw
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import com.aistudio.richfarmaciw.data.db.provideRichFarmaciDatabase
 import com.aistudio.richfarmaciw.ui.screens.MainScreen
 import com.aistudio.richfarmaciw.ui.theme.RichFarmaciTheme
@@ -16,6 +20,11 @@ fun App(context: Any? = null) {
     }
 
     RichFarmaciTheme {
-        MainScreen(viewModel = viewModel)
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            MainScreen(viewModel = viewModel)
+        }
     }
 }

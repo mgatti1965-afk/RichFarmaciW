@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.ContactsContract
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -39,6 +40,8 @@ actual fun rememberContactPicker(
                 val contactInfo = queryContactInfo(context, uri)
                 if (contactInfo != null) {
                     currentOnContactPicked(contactInfo)
+                } else {
+                    Toast.makeText(context, "Nessuna anagrafica o numero trovato nel contatto selezionato", Toast.LENGTH_SHORT).show()
                 }
             }
         }

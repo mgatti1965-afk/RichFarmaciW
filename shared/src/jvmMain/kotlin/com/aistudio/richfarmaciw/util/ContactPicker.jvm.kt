@@ -16,8 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.io.File
-import javax.swing.JFileChooser
-import javax.swing.filechooser.FileNameExtensionFilter
 
 class DesktopContactPickerLauncher(
     private val onLaunch: () -> Unit
@@ -37,32 +35,16 @@ actual fun rememberContactPicker(
     var showSelectionDialog by remember { mutableStateOf(false) }
     var showNoContactsMessage by remember { mutableStateOf(false) }
 
-    fun pickFromFile() {
-        try {
-            val chooser = JFileChooser().apply {
-                dialogTitle = "Seleziona File Rubrica / Contatti (.vcf, .vcard, .txt)"
-                isAcceptAllFileFilterUsed = true
-                fileFilter = FileNameExtensionFilter("File Contatti (*.vcf, *.vcard, *.txt)", "vcf", "vcard", "txt")
+    fun loadFromSystemRubrica() {
+        val contacts = getWindowsSystemContacts()
+        if (contacts.isNotEmpty()) {
+            if (contacts.size == 1) {
+                currentOnContactPicked(contacts.first())
+            } else {
+                contactList = contacts
+                showSelectionDialog = true
             }
-            val result = chooser.showOpenDialog(null)
-            if (result == JFileChooser.APPROVE_OPTION) {
-                val file = chooser.selectedFile
-                if (file != null && file.exists()) {
-                    val parsed = parseAllVCardContacts(file)
-                    if (parsed.isNotEmpty()) {
-                        if (parsed.size == 1) {
-                            currentOnContactPicked(parsed.first())
-                        } else {
-                            contactList = parsed
-                            showSelectionDialog = true
-                        }
-                    } else {
-                        showNoContactsMessage = true
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } else {
             showNoContactsMessage = true
         }
     }
@@ -71,11 +53,11 @@ actual fun rememberContactPicker(
         AlertDialog(
             onDismissRequest = { showNoContactsMessage = false },
             title = {
-                Text("Nessun Contatto Trovato", fontWeight = FontWeight.Bold)
+                Text("Nessuna Anagrafica in Rubrica", fontWeight = FontWeight.Bold)
             },
             text = {
                 Text(
-                    "Non sono state trovate anagrafiche valide nella rubrica o nel file selezionato.",
+                    "Nessuna anagrafica o contatto trovato nella rubrica di sistema.",
                     color = Color(0xFF475569)
                 )
             },
@@ -97,7 +79,7 @@ actual fun rememberContactPicker(
         AlertDialog(
             onDismissRequest = { showSelectionDialog = false },
             title = {
-                Text("Seleziona Contatto Medico", fontWeight = FontWeight.Bold)
+                Text("Seleziona Medico dalla Rubrica", fontWeight = FontWeight.Bold)
             },
             text = {
                 LazyColumn(
@@ -159,89 +141,85 @@ actual fun rememberContactPicker(
 
     return remember {
         DesktopContactPickerLauncher {
-            pickFromFile()
+            loadFromSystemRubrica()
         }
     }
 }
 
-private fun parseAllVCardContacts(file: File): List<ContactInfo> {
+private fun getWindowsSystemContacts(): List<ContactInfo> {
     val results = mutableListOf<ContactInfo>()
     try {
-        val lines = file.readLines()
-        var currentName = ""
-        var currentPhone = ""
-        var currentEmail = ""
+        val userProfile = System.getenv("USERPROFILE") ?: System.getProperty("user.home") ?: return emptyList()
+        val contactsDir = File(userProfile, "Contacts")
 
-        fun flushCurrent() {
-            val cleanPhone = if (currentPhone.isNotBlank()) {
-                currentPhone.replace("[^0-9+]".toRegex(), "")
-            } else {
-                currentEmail.trim()
-            }
-            if (currentName.isNotBlank() || cleanPhone.isNotBlank()) {
-                results.add(ContactInfo(currentName.trim(), cleanPhone))
-            }
-            currentName = ""
-            currentPhone = ""
-            currentEmail = ""
-        }
+        if (contactsDir.exists() && contactsDir.isDirectory) {
+            val contactFiles = contactsDir.listFiles { _, name ->
+                val lower = name.lowercase()
+                lower.endsWith(".contact") || lower.endsWith(".vcf") || lower.endsWith(".vcard")
+            } ?: emptyArray()
 
-        for (line in lines) {
-            val trimmed = line.trim()
-            val upper = trimmed.uppercase()
-
-            if (upper.startsWith("BEGIN:VCARD")) {
-                currentName = ""
-                currentPhone = ""
-                currentEmail = ""
-            } else if (upper.startsWith("END:VCARD")) {
-                flushCurrent()
-            } else if (upper.startsWith("FN:") || upper.startsWith("FN;")) {
-                val colonIdx = trimmed.indexOf(":")
-                if (colonIdx >= 0) {
-                    currentName = trimmed.substring(colonIdx + 1).trim()
-                }
-            } else if (currentName.isBlank() && (upper.startsWith("N:") || upper.startsWith("N;"))) {
-                val colonIdx = trimmed.indexOf(":")
-                if (colonIdx >= 0) {
-                    val parts = trimmed.substring(colonIdx + 1).split(";")
-                    val cleanParts = parts.map { it.trim() }.filter { it.isNotBlank() }
-                    currentName = cleanParts.reversed().joinToString(" ")
-                }
-            } else if (upper.startsWith("TEL") || upper.contains("TEL;")) {
-                val colonIdx = trimmed.indexOf(":")
-                if (colonIdx >= 0) {
-                    val rawNum = trimmed.substring(colonIdx + 1).trim()
-                    if (currentPhone.isBlank()) {
-                        currentPhone = rawNum
+            for (file in contactFiles) {
+                try {
+                    val info = parseSingleWindowsContactFile(file)
+                    if (info != null) {
+                        results.add(info)
                     }
-                }
-            } else if (upper.startsWith("EMAIL") || upper.contains("EMAIL;")) {
-                val colonIdx = trimmed.indexOf(":")
-                if (colonIdx >= 0) {
-                    val rawEmail = trimmed.substring(colonIdx + 1).trim()
-                    if (currentEmail.isBlank()) {
-                        currentEmail = rawEmail
-                    }
-                }
-            }
-        }
-
-        if (results.isEmpty() && (currentName.isNotBlank() || currentPhone.isNotBlank() || currentEmail.isNotBlank())) {
-            flushCurrent()
-        }
-
-        if (results.isEmpty()) {
-            for (line in lines) {
-                val trimmed = line.trim()
-                if (trimmed.isBlank()) continue
-                if (trimmed.matches(".*[0-9]{5,}.*".toRegex())) {
-                    results.add(ContactInfo("Contatto Rubrica", trimmed.replace("[^0-9+]".toRegex(), "")))
-                }
+                } catch (_: Exception) {}
             }
         }
     } catch (e: Exception) {
         e.printStackTrace()
     }
     return results
+}
+
+private fun parseSingleWindowsContactFile(file: File): ContactInfo? {
+    var name = ""
+    var phone = ""
+    var email = ""
+
+    try {
+        val content = file.readText()
+
+        if (file.name.lowercase().endsWith(".contact")) {
+            val formattedNameMatch = Regex("<c[a-zA-Z0-9:]*FormattedName[^>]*>(.*?)</", RegexOption.IGNORE_CASE).find(content)
+            if (formattedNameMatch != null) {
+                name = formattedNameMatch.groupValues[1].trim()
+            }
+
+            val phoneMatch = Regex("<c[a-zA-Z0-9:]*Number[^>]*>(.*?)</", RegexOption.IGNORE_CASE).find(content)
+            if (phoneMatch != null) {
+                phone = phoneMatch.groupValues[1].trim()
+            }
+
+            val emailMatch = Regex("<c[a-zA-Z0-9:]*Address[^>]*>(.*?)</", RegexOption.IGNORE_CASE).find(content)
+            if (emailMatch != null) {
+                email = emailMatch.groupValues[1].trim()
+            }
+        } else {
+            val lines = content.lines()
+            for (line in lines) {
+                val trimmed = line.trim()
+                val upper = trimmed.uppercase()
+                if (upper.startsWith("FN:") || upper.startsWith("FN;")) {
+                    val colonIdx = trimmed.indexOf(":")
+                    if (colonIdx >= 0) name = trimmed.substring(colonIdx + 1).trim()
+                } else if (upper.startsWith("TEL") || upper.contains("TEL;")) {
+                    val colonIdx = trimmed.indexOf(":")
+                    if (colonIdx >= 0 && phone.isBlank()) phone = trimmed.substring(colonIdx + 1).trim()
+                } else if (upper.startsWith("EMAIL") || upper.contains("EMAIL;")) {
+                    val colonIdx = trimmed.indexOf(":")
+                    if (colonIdx >= 0 && email.isBlank()) email = trimmed.substring(colonIdx + 1).trim()
+                }
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+
+    val cleanPhone = if (phone.isNotBlank()) phone.replace("[^0-9+]".toRegex(), "") else email.trim()
+
+    return if (name.isNotBlank() || cleanPhone.isNotBlank()) {
+        ContactInfo(name = name.ifBlank { file.nameWithoutExtension }, phoneOrEmail = cleanPhone)
+    } else null
 }

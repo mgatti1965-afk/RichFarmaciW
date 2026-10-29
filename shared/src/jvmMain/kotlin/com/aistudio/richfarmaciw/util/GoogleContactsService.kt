@@ -18,7 +18,7 @@ import kotlinx.serialization.json.jsonPrimitive
 
 object GoogleContactsService {
 
-    private const val CLIENT_ID = "1098272982858-desktop-app.apps.googleusercontent.com"
+    var userClientId: String = ""
     private const val PORT = 8888
     private const val REDIRECT_URI = "http://localhost:$PORT/oauth2callback"
 
@@ -40,6 +40,10 @@ object GoogleContactsService {
     }
 
     private fun authenticateAndGetToken(): String? {
+        val clientId = userClientId.trim().ifBlank {
+            "1098272982858-desktop-app.apps.googleusercontent.com"
+        }
+
         var tokenResult: String? = null
         var serverSocket: ServerSocket? = null
 
@@ -49,7 +53,7 @@ object GoogleContactsService {
 
             val authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
                     "response_type=token&" +
-                    "client_id=$CLIENT_ID&" +
+                    "client_id=$clientId&" +
                     "redirect_uri=$REDIRECT_URI&" +
                     "scope=https://www.googleapis.com/auth/contacts.readonly"
 

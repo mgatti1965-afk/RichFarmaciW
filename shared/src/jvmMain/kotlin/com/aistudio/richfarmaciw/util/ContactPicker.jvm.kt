@@ -35,11 +35,15 @@ actual fun rememberContactPicker(
     val scope = rememberCoroutineScope()
 
     var contactList by remember { mutableStateOf<List<ContactInfo>>(emptyList()) }
+    var showAuthPromptDialog by remember { mutableStateOf(false) }
     var showSelectionDialog by remember { mutableStateOf(false) }
     var showNoContactsMessage by remember { mutableStateOf(false) }
+    var showClientIdConfigDialog by remember { mutableStateOf(false) }
+    var inputClientId by remember { mutableStateOf(GoogleContactsService.userClientId) }
     var isLoading by remember { mutableStateOf(false) }
 
-    fun loadFromGoogleOrSystemRubrica() {
+    fun startGoogleAuth() {
+        showAuthPromptDialog = false
         scope.launch {
             isLoading = true
             var contacts = GoogleContactsService.fetchContacts()
@@ -61,6 +65,37 @@ actual fun rememberContactPicker(
         }
     }
 
+    if (showAuthPromptDialog) {
+        AlertDialog(
+            onDismissRequest = { showAuthPromptDialog = false },
+            title = {
+                Text("Accesso a Google Contatti", fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Text(
+                    "RichFarmaciW desidera accedere alla tua rubrica per selezionare i dati del Medico curante. Desideri aprire la pagina di autorizzazione Google?",
+                    color = Color(0xFF475569)
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { startGoogleAuth() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("CONSENTI CON GOOGLE", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAuthPromptDialog = false }) {
+                    Text("ANNULLA", color = Color(0xFF475569))
+                }
+            },
+            shape = RoundedCornerShape(16.dp),
+            containerColor = Color.White
+        )
+    }
+
     if (isLoading) {
         AlertDialog(
             onDismissRequest = { },
@@ -71,7 +106,7 @@ actual fun rememberContactPicker(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(color = Color(0xFF059669), modifier = Modifier.size(28.dp))
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Caricamento rubrica contatti...", color = Color(0xFF475569))
+                    Text("In attesa di autorizzazione da Google...", color = Color(0xFF475569))
                 }
             },
             confirmButton = {},
@@ -87,10 +122,18 @@ actual fun rememberContactPicker(
                 Text("Nessuna Anagrafica in Rubrica", fontWeight = FontWeight.Bold)
             },
             text = {
-                Text(
-                    "Nessuna anagrafica o contatto trovato nella rubrica di Google Contatti o di sistema.",
-                    color = Color(0xFF475569)
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "Nessuna anagrafica trovata nella rubrica o autorizzazione non completata.",
+                        color = Color(0xFF475569)
+                    )
+                    TextButton(onClick = {
+                        showNoContactsMessage = false
+                        showClientIdConfigDialog = true
+                    }) {
+                        Text("⚙️ Configura ID Client Google OAuth", color = Color(0xFF059669), fontSize = 12.sp)
+                    }
+                }
             },
             confirmButton = {
                 Button(
@@ -99,6 +142,52 @@ actual fun rememberContactPicker(
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text("OK", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            },
+            shape = RoundedCornerShape(16.dp),
+            containerColor = Color.White
+        )
+    }
+
+    if (showClientIdConfigDialog) {
+        AlertDialog(
+            onDismissRequest = { showClientIdConfigDialog = false },
+            title = {
+                Text("Configurazione Client ID Google", fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        "Per accedere a Google Contatti da app desktop, inserisci il tuo Client ID OAuth2 di Google Cloud:",
+                        color = Color(0xFF475569),
+                        fontSize = 13.sp
+                    )
+                    OutlinedTextField(
+                        value = inputClientId,
+                        onValueChange = { inputClientId = it },
+                        label = { Text("Client ID Google Cloud") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        GoogleContactsService.userClientId = inputClientId.trim()
+                        showClientIdConfigDialog = false
+                        startGoogleAuth()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("SALVA E CONNETTI", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClientIdConfigDialog = false }) {
+                    Text("ANNULLA", color = Color(0xFF475569))
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -172,7 +261,7 @@ actual fun rememberContactPicker(
 
     return remember {
         DesktopContactPickerLauncher {
-            loadFromGoogleOrSystemRubrica()
+            showAuthPromptDialog = true
         }
     }
 }

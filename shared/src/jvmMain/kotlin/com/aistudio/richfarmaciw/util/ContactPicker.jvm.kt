@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.io.File
+import java.awt.Desktop
+import java.net.URI
 
 class DesktopContactPickerLauncher(
     private val onLaunch: () -> Unit
@@ -35,8 +37,8 @@ actual fun rememberContactPicker(
     var showSelectionDialog by remember { mutableStateOf(false) }
     var showNoContactsMessage by remember { mutableStateOf(false) }
 
-    fun loadFromSystemRubrica() {
-        val contacts = getWindowsSystemContacts()
+    fun loadFromSystemOrGoogleRubrica() {
+        val contacts = fetchGoogleAndWindowsContacts()
         if (contacts.isNotEmpty()) {
             if (contacts.size == 1) {
                 currentOnContactPicked(contacts.first())
@@ -57,17 +59,31 @@ actual fun rememberContactPicker(
             },
             text = {
                 Text(
-                    "Nessuna anagrafica o contatto trovato nella rubrica di sistema.",
+                    "Nessuna anagrafica o contatto trovato nella rubrica di sistema o Google Contatti.",
                     color = Color(0xFF475569)
                 )
             },
             confirmButton = {
                 Button(
-                    onClick = { showNoContactsMessage = false },
+                    onClick = {
+                        showNoContactsMessage = false
+                        try {
+                            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                                Desktop.getDesktop().browse(URI("https://contacts.google.com"))
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("OK", fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("APRI GOOGLE CONTATTI", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showNoContactsMessage = false }) {
+                    Text("OK", color = Color(0xFF475569))
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -141,22 +157,19 @@ actual fun rememberContactPicker(
 
     return remember {
         DesktopContactPickerLauncher {
-            loadFromSystemRubrica()
+            loadFromSystemOrGoogleRubrica()
         }
     }
 }
 
-private fun getWindowsSystemContacts(): List<ContactInfo> {
+private fun fetchGoogleAndWindowsContacts(): List<ContactInfo> {
     val results = mutableListOf<ContactInfo>()
     try {
         val userProfile = System.getenv("USERPROFILE") ?: System.getProperty("user.home") ?: return emptyList()
         val contactsDir = File(userProfile, "Contacts")
 
         if (contactsDir.exists() && contactsDir.isDirectory) {
-            val contactFiles = contactsDir.listFiles { _, name ->
-                val lower = name.lowercase()
-                lower.endsWith(".contact") || lower.endsWith(".vcf") || lower.endsWith(".vcard")
-            } ?: emptyArray()
+            val contactFiles = contactsDir.listFiles() ?: emptyArray()
 
             for (file in contactFiles) {
                 try {

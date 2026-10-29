@@ -105,7 +105,7 @@ kotlin {
         }
 
         if (isMac) {
-            val iosMain by creating {
+            val iosMain by getting {
                 dependsOn(roomTargetsMain)
             }
         }

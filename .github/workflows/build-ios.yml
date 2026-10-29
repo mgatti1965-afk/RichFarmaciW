@@ -31,6 +31,9 @@ jobs:
                      -sdk iphonesimulator \
                      -configuration Release \
                      -derivedDataPath build/DerivedData \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGN_IDENTITY="" \
                      ONLY_ACTIVE_ARCH=NO
 
       - name: Zip iOS Simulator App

@@ -1,11 +1,12 @@
 package com.aistudio.richfarmaciw.util
 
-import com.sun.net.httpserver.HttpServer
 import java.awt.Desktop
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.io.PrintWriter
 import java.net.HttpURLConnection
-import java.net.InetSocketAddress
+import java.net.InetAddress
+import java.net.ServerSocket
 import java.net.URI
 import java.net.URL
 import kotlinx.coroutines.Dispatchers
@@ -40,50 +41,11 @@ object GoogleContactsService {
 
     private fun authenticateAndGetToken(): String? {
         var tokenResult: String? = null
-        val lock = Object()
+        var serverSocket: ServerSocket? = null
 
-        var server: HttpServer? = null
         try {
-            server = HttpServer.create(InetSocketAddress(PORT), 0)
-            server.createContext("/oauth2callback") { exchange ->
-                val query = exchange.requestURI.query
-
-                var token: String? = null
-                if (query != null && query.contains("access_token=")) {
-                    token = query.substringAfter("access_token=").substringBefore("&")
-                }
-
-                val htmlResponse = """
-                    <!DOCTYPE html>
-                    <html>
-                    <head><title>Autorizzazione Completata</title></head>
-                    <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #f8fafc;">
-                        <h2 style="color: #059669;">Autorizzazione Google completata!</h2>
-                        <p>Puoi chiudere questa finestra e tornare a RichFarmaciW.</p>
-                        <script>
-                            if (window.location.hash && window.location.hash.includes('access_token=')) {
-                                var token = window.location.hash.split('access_token=')[1].split('&')[0];
-                                window.location.href = 'http://localhost:$PORT/oauth2callback?access_token=' + token;
-                            }
-                        </script>
-                    </body>
-                    </html>
-                """.trimIndent()
-
-                exchange.sendResponseHeaders(200, htmlResponse.toByteArray().size.toLong())
-                val os = exchange.responseBody
-                os.write(htmlResponse.toByteArray())
-                os.close()
-
-                if (!token.isNullOrBlank()) {
-                    synchronized(lock) {
-                        tokenResult = token
-                        lock.notifyAll()
-                    }
-                }
-            }
-
-            server.start()
+            serverSocket = ServerSocket(PORT, 1, InetAddress.getByName("localhost"))
+            serverSocket.soTimeout = 60000
 
             val authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
                     "response_type=token&" +
@@ -95,13 +57,70 @@ object GoogleContactsService {
                 Desktop.getDesktop().browse(URI(authUrl))
             }
 
-            synchronized(lock) {
-                lock.wait(60000)
+            val clientSocket = serverSocket.accept()
+            val reader = BufferedReader(InputStreamReader(clientSocket.getInputStream()))
+            val out = PrintWriter(clientSocket.getOutputStream(), true)
+
+            val requestLine = reader.readLine() ?: ""
+            
+            var token: String? = null
+            if (requestLine.contains("access_token=")) {
+                token = requestLine.substringAfter("access_token=").substringBefore("&").substringBefore(" ")
             }
+
+            val htmlResponse = """
+                <!DOCTYPE html>
+                <html>
+                <head><title>Autorizzazione Completata</title></head>
+                <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #f8fafc;">
+                    <h2 style="color: #059669;">Autorizzazione Google completata!</h2>
+                    <p>Puoi chiudere questa finestra e tornare a RichFarmaciW.</p>
+                    <script>
+                        if (window.location.hash && window.location.hash.includes('access_token=')) {
+                            var t = window.location.hash.split('access_token=')[1].split('&')[0];
+                            window.location.href = 'http://localhost:$PORT/oauth2callback?access_token=' + t;
+                        }
+                    </script>
+                </body>
+                </html>
+            """.trimIndent()
+
+            out.println("HTTP/1.1 200 OK")
+            out.println("Content-Type: text/html; charset=UTF-8")
+            out.println("Content-Length: " + htmlResponse.toByteArray(Charsets.UTF_8).size)
+            out.println("Connection: close")
+            out.println()
+            out.println(htmlResponse)
+            out.flush()
+
+            clientSocket.close()
+
+            if (token.isNullOrBlank()) {
+                val clientSocket2 = serverSocket.accept()
+                val reader2 = BufferedReader(InputStreamReader(clientSocket2.getInputStream()))
+                val out2 = PrintWriter(clientSocket2.getOutputStream(), true)
+
+                val requestLine2 = reader2.readLine() ?: ""
+                if (requestLine2.contains("access_token=")) {
+                    token = requestLine2.substringAfter("access_token=").substringBefore("&").substringBefore(" ")
+                }
+
+                out2.println("HTTP/1.1 200 OK")
+                out2.println("Content-Type: text/html; charset=UTF-8")
+                out2.println("Content-Length: " + htmlResponse.toByteArray(Charsets.UTF_8).size)
+                out2.println("Connection: close")
+                out2.println()
+                out2.println(htmlResponse)
+                out2.flush()
+
+                clientSocket2.close()
+            }
+
+            tokenResult = token
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
-            try { server?.stop(0) } catch (_: Exception) {}
+            try { serverSocket?.close() } catch (_: Exception) {}
         }
 
         return tokenResult

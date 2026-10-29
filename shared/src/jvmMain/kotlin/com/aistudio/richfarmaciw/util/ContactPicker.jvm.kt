@@ -15,9 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import java.io.File
-import java.awt.Desktop
-import java.net.URI
 
 class DesktopContactPickerLauncher(
     private val onLaunch: () -> Unit
@@ -33,22 +32,52 @@ actual fun rememberContactPicker(
     onContactPicked: (ContactInfo) -> Unit
 ): ContactPickerLauncher {
     val currentOnContactPicked by rememberUpdatedState(onContactPicked)
+    val scope = rememberCoroutineScope()
+
     var contactList by remember { mutableStateOf<List<ContactInfo>>(emptyList()) }
     var showSelectionDialog by remember { mutableStateOf(false) }
     var showNoContactsMessage by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
-    fun loadFromSystemOrGoogleRubrica() {
-        val contacts = fetchGoogleAndWindowsContacts()
-        if (contacts.isNotEmpty()) {
-            if (contacts.size == 1) {
-                currentOnContactPicked(contacts.first())
-            } else {
-                contactList = contacts
-                showSelectionDialog = true
+    fun loadFromGoogleOrSystemRubrica() {
+        scope.launch {
+            isLoading = true
+            var contacts = GoogleContactsService.fetchContacts()
+            if (contacts.isEmpty()) {
+                contacts = getWindowsSystemContacts()
             }
-        } else {
-            showNoContactsMessage = true
+            isLoading = false
+
+            if (contacts.isNotEmpty()) {
+                if (contacts.size == 1) {
+                    currentOnContactPicked(contacts.first())
+                } else {
+                    contactList = contacts
+                    showSelectionDialog = true
+                }
+            } else {
+                showNoContactsMessage = true
+            }
         }
+    }
+
+    if (isLoading) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = {
+                Text("Accesso a Google Contatti", fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(color = Color(0xFF059669), modifier = Modifier.size(28.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("Caricamento rubrica contatti...", color = Color(0xFF475569))
+                }
+            },
+            confirmButton = {},
+            shape = RoundedCornerShape(16.dp),
+            containerColor = Color.White
+        )
     }
 
     if (showNoContactsMessage) {
@@ -59,31 +88,17 @@ actual fun rememberContactPicker(
             },
             text = {
                 Text(
-                    "Nessuna anagrafica o contatto trovato nella rubrica di sistema o Google Contatti.",
+                    "Nessuna anagrafica o contatto trovato nella rubrica di Google Contatti o di sistema.",
                     color = Color(0xFF475569)
                 )
             },
             confirmButton = {
                 Button(
-                    onClick = {
-                        showNoContactsMessage = false
-                        try {
-                            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                                Desktop.getDesktop().browse(URI("https://contacts.google.com"))
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    },
+                    onClick = { showNoContactsMessage = false },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("APRI GOOGLE CONTATTI", fontWeight = FontWeight.Bold, color = Color.White)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showNoContactsMessage = false }) {
-                    Text("OK", color = Color(0xFF475569))
+                    Text("OK", fontWeight = FontWeight.Bold, color = Color.White)
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -157,12 +172,12 @@ actual fun rememberContactPicker(
 
     return remember {
         DesktopContactPickerLauncher {
-            loadFromSystemOrGoogleRubrica()
+            loadFromGoogleOrSystemRubrica()
         }
     }
 }
 
-private fun fetchGoogleAndWindowsContacts(): List<ContactInfo> {
+private fun getWindowsSystemContacts(): List<ContactInfo> {
     val results = mutableListOf<ContactInfo>()
     try {
         val userProfile = System.getenv("USERPROFILE") ?: System.getProperty("user.home") ?: return emptyList()

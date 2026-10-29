@@ -80,7 +80,6 @@ kotlin {
                 api(libs.androidx.room.runtime)
                 api(libs.sqlite.bundled)
                 api(libs.sqlite)
-                implementation(libs.ktor.client.cio)
             }
         }
 
@@ -97,16 +96,23 @@ kotlin {
                 implementation(libs.androidx.activity.compose)
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.compose.uiTooling)
+                implementation(libs.ktor.client.cio)
             }
         }
 
         val jvmMain by getting {
             dependsOn(roomTargetsMain)
+            dependencies {
+                implementation(libs.ktor.client.cio)
+            }
         }
 
         if (isMac) {
             val iosMain by getting {
                 dependsOn(roomTargetsMain)
+                dependencies {
+                    implementation(libs.ktor.client.darwin)
+                }
             }
         }
 
